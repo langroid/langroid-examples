@@ -23,7 +23,8 @@ def chat() -> None:
     config = ChatAgentConfig(
         llm = OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
-        )
+        ),
+        vecdb=None,
     )
     agent = ChatAgent(config)
     task = Task(agent)
