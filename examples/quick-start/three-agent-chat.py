@@ -26,6 +26,8 @@ def chat() -> None:
     student_task = Task(
         student_agent,
         name = "Student",
+        llm_delegate=True,
+        single_round=False,
         system_message="""
         Your task is to write 4 short bullet points about 
         Language Models in the context of Machine Learning (ML),
