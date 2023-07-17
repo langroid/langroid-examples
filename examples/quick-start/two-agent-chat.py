@@ -1,7 +1,9 @@
 import typer
-from rich import print
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
+from langroid.agent.special.recipient_validator_agent import (
+    RecipientValidator, RecipientValidatorConfig
+)
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from langroid.utils.configuration import set_global, Settings
@@ -21,7 +23,6 @@ def chat() -> None:
         vecdb = None,
     )
     student_agent = ChatAgent(config)
-    expert_agent = ChatAgent(config)
     student_task = Task(
         student_agent,
         name = "Student",
@@ -34,6 +35,7 @@ def chat() -> None:
         Once you have what you need, say DONE, and show me the 3 bullet points. 
         """,
     )
+    expert_agent = ChatAgent(config)
     expert_task = Task(
         expert_agent,
         name = "Expert",
