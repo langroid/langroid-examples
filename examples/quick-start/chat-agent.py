@@ -27,7 +27,7 @@ def chat() -> None:
         vecdb=None,
     )
     agent = ChatAgent(config)
-    task = Task(agent)
+    task = Task(agent, name="Bot")
     task.run()
 
 
