@@ -1,5 +1,7 @@
 # langroid-examples
 
+Examples of using the [Langroid](https://github.com/langroid/langroid) 
+Multi-Agent Programming framework to build LLM applications.
 
 ## Set up poetry env
 
