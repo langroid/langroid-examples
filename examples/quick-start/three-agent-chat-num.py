@@ -19,12 +19,21 @@ def chat() -> None:
         ),
         vecdb = None,
     )
-    repeater_agent = ChatAgent(config)
-    repeater_task = Task(
-        repeater_agent,
-        name = "Repeater",
+    processor_agent = ChatAgent(config)
+    processor_task = Task(
+        processor_agent,
+        name = "Processor",
         system_message="""
-        Your job is to repeat whatever number you receive.
+        You will receive a list of numbers from the user.
+        Your goal is to apply a transformation to each number.
+        However you do not know how to do this transformation, 
+        so the user will help you. 
+        You can simply send the user each number FROM THE GIVEN LIST
+        and the user will return the result 
+        with the appropriate transformation applied.
+        IMPORTANT: only send one number at a time, concisely, say nothing else.
+        Once you have accomplished your goal, say DONE and show the result.
+        Start by asking the user for the list of numbers.
         """,
         llm_delegate=True,
         single_round=False,
@@ -53,8 +62,8 @@ def chat() -> None:
         single_round=True,  # task done after 1 step() with valid response
     )
 
-    repeater_task.add_sub_task([even_task, odd_task])
-    repeater_task.run("3")
+    processor_task.add_sub_task([even_task, odd_task])
+    processor_task.run()
 
 
 @app.command()

@@ -22,20 +22,31 @@ def chat() -> None:
         ),
         vecdb = None,
     )
-    router_agent = ChatAgent(config)
-    router_task = Task(
-        router_agent,
-        name = "Router",
+    processor_agent = ChatAgent(config)
+    processor_task = Task(
+        processor_agent,
+        name = "Processor",
         system_message="""
-        Your job is to send the current number to one of two people:
+        You will receive a list of numbers from me (the user).
+        Your goal is to apply a transformation to each number.
+        However you do not know how to do this transformation.
+        You can take the help of two people to perform the 
+        transformation.
         If the number is even, send it to EvenHandler,
         and if it is odd, send it to OddHandler.
+        
+        IMPORTANT: send the numbers ONE AT A TIME
+        
         The handlers will transform the number and give you a new number.        
         If you send it to the wrong person, you will receive a negative value.
-        Your goal is to never get a negative number, so you must 
+        Your aim is to never get a negative number, so you must 
         clearly specify who you are sending the number to, by starting 
         your message with "TO[EvenHandler]:" or "TO[OddHandler]:".
         For example, you could say "TO[EvenHandler]: 4".
+        
+        Once all numbers in the given list have been transformed, 
+        say DONE and show me the result. 
+        Start by asking me for the list of numbers.
         """,
         llm_delegate=True,
         single_round=False,
@@ -70,8 +81,8 @@ def chat() -> None:
     )
     validator_task = Task(validator_agent, single_round=True)
 
-    router_task.add_sub_task([validator_task, even_task, odd_task])
-    router_task.run("3")
+    processor_task.add_sub_task([validator_task, even_task, odd_task])
+    processor_task.run()
 
 
 @app.command()

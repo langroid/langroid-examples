@@ -17,27 +17,20 @@ setup_colored_logging()
 class ProbeTool(ToolMessage):
     request: str = "probe"
     purpose: str = """
-        To find which number in my list is closest to the <number> you specify
+        To find how many numbers in my list are less than or equal to  
+        the <number> you specify.
         """
     number: int
-    result: int = "0"
 
-    @classmethod
-    def examples(cls) -> List["ProbeTool"]:
-        return [
-            cls(number=1),
-            cls(number=5),
-        ]
 
 class SpyGameAgent(ChatAgent):
     def __init__(self, config: ChatAgentConfig):
         super().__init__(config)
-        self.numbers = [1, 3, 4, 8, 11, 15, 25, 40, 80, 90]
+        self.numbers = [3, 4, 8, 11, 15]
 
     def probe(self, msg: ProbeTool) -> str:
-        # return the number in self.numbers that is closest to the number
-        distances = [abs(msg.number - n) for n in self.numbers]
-        return str(self.numbers[distances.index(min(distances))])
+        # return how many numbers in self.numbers are less or equal to msg.number
+        return str(len([n for n in self.numbers if n <= msg.number]))
 
 
 class CLIOptions(BaseSettings):
@@ -67,12 +60,12 @@ def chat(opts: CLIOptions) -> None:
     task = Task(
         spy_game_agent,
         system_message="""
-            I have a list of numbers between 1 and 100. 
-            Your job is to find at least 4 of them.
+            I have a list of numbers between 1 and 20.
+            Your job is to find the smallest of them.
             To help with this, you can give me a number and I will
-            tell you the nearest number in my list.
-            Once you have found at least 4 numbers, 
-            you can say DONE and report those numbers to me. 
+            tell you how many of my numbers are equal or less than your number.
+            Once you have found the smallest number,
+            you can say DONE and report your answer.
         """
     )
     task.run()

@@ -30,8 +30,10 @@ app = typer.Typer()
 
 setup_colored_logging()
 
-
 class MethodQuality(BaseModel):
+    """
+    Structure we want to extract
+    """
     name: str
     quality: str
 
@@ -58,10 +60,14 @@ class MethodsList(ToolMessage):
 
 
 class ExtractorAgent(ChatAgent):
-    def __init__(self, config: ChatAgentConfig):
-        super().__init__(config)
-
     def methods_list(self, message: MethodsList) -> str:
+        """
+        Method to handle the MethodsList ToolMessage
+        Args:
+            message: MethodsList ToolMessage
+        Returns:
+            str: JSON string of the methods list
+        """
         print(
             f"""
         DONE! Successfully extracted ML Methods list:
@@ -71,24 +77,7 @@ class ExtractorAgent(ChatAgent):
         return "\n".join(json.dumps(m.dict()) for m in message.methods)
 
 
-class ExtractorConfig(ChatAgentConfig):
-    name = "Extractor"
-    debug: bool = False
-    max_context_tokens = 500
-    conversation_mode = True
-    cache: bool = True  # cache results
-    gpt4: bool = False  # use GPT-4?
-    stream: bool = True  # allow streaming where needed
-    max_tokens: int = 10000
-    use_tools = False
-    use_functions_api = True
-    llm: OpenAIGPTConfig = OpenAIGPTConfig(
-        type="openai",
-        chat_model=OpenAIChatModel.GPT4,
-    )
-
-
-def chat(config: ExtractorConfig) -> None:
+def chat(config: ChatAgentConfig) -> None:
     print(
         textwrap.dedent(
             """
@@ -130,10 +119,14 @@ def main(
     nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
     fn_api: bool = typer.Option(False, "--fn_api", "-f", help="use functions api"),
 ) -> None:
-    config = ExtractorConfig(
+    config = ChatAgentConfig(
+        llm = OpenAIGPTConfig(
+            chat_model=OpenAIChatModel.GPT4,
+        ),
         use_functions_api=fn_api,
         use_tools=not fn_api,
     )
+
     set_global(
         Settings(
             debug=debug,
