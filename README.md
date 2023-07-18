@@ -27,11 +27,17 @@ poetry install
 
 Copy the `.env-template` file to a new file `.env` and
 insert these secrets:
-- OpenAI API key,
-- GitHub Personal Access Token (needed by  PyGithub to analyze git repos;
-  token-based API calls are less rate-limited).
-- Redis Password (ask @pchalasani for this) for the redis cache.
-- Qdrant API key (ask @pchalasani for this) for the vector db.
+- **OpenAI API** key (required): If you don't have one, see [this OpenAI Page](https://help.openai.com/en/collections/3675940-getting-started-with-openai-api).
+- **Qdrant** Vector Store API Key (required for apps that need retrieval from
+  documents): Sign up for a free 1GB account at [Qdrant cloud](https://cloud.qdrant.io)
+  Alternatively [Chroma](https://docs.trychroma.com/) is also currently supported.
+  We use the local-storage version of Chroma, so there is no need for an API key.
+- **GitHub** Personal Access Token (required for apps that need to analyze git
+  repos; token-based API calls are less rate-limited). See this
+  [GitHub page](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+- **Redis** Password (optional, only needed to cache LLM API responses):
+  Redis [offers](https://redis.com/try-free/) a free 30MB Redis account
+  which is more than sufficient to try out Langroid and even beyond.
 
 ```bash
 cp .env-template .env
