@@ -1,15 +1,13 @@
 """
 A simple example of two agents collaborating on a task.
 
-The `Student` Agent is tasked with writing 3 key points on Language Models,
+The Student Agent is tasked with writing 3 key points on Language Models,
   and it is told that it knows nothing about the topic, and
-  can consult an `Expert` Agent for help.
+  can consult an Expert Agent for help.
 
 Run as follows:
 
-```bash
 python3 examples/quick-start/two-agent-chat.py
-```
 
 """
 import typer

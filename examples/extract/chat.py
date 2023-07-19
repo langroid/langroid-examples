@@ -6,9 +6,7 @@ https://wandb.ai/darek/llmapps/reports/Using-LLMs-to-Extract-Structured-Data-Ope
 
 Example usage, to use Langroid tool:
 
-```bash
 python3 examples/basic/extract.py
-```
 
 Use -f option to use OpenAI function calling API instead of Langroid tool.
 

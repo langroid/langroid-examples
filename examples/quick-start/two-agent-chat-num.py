@@ -1,15 +1,13 @@
 """
 A toy numerical example showing how two agents can collaborate on a task.
 
-The `Student` Agent is tasked with calculating the sum of a list of numbers,
+The Student Agent is tasked with calculating the sum of a list of numbers,
 and is told that it knows nothing about addition, and can ask for help
-from an `Adder` Agent who can add pairs of numbers.
+from an Adder Agent who can add pairs of numbers.
 
 Run as follows:
 
-```bash
 python3 examples/quick-start/two-agent-chat-num.py
-```
 
 For more explanation see the
 [Getting Started guide](https://langroid.github.io/langroid/quick-start/two-agent-chat-num/)

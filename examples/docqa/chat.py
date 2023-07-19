@@ -1,5 +1,5 @@
 """
-Full working example of a Langroid `DocChatAgent` that uses a Retrieval-augmented LLM
+Full working example of a Langroid DocChatAgent that uses a Retrieval-augmented LLM
 to answer questions about a collection of documents.
 """
 import re

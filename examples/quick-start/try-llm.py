@@ -4,9 +4,7 @@ i.e., without wrapping it in an Agent.
 
 Run as follows:
 
-```bash
 python3 examples/quick-start/try-llm.py
-```
 
 For more explanation see the
 [Getting Started guide](https://langroid.github.io/langroid/quick-start/llm-interaction/)
