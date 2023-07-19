@@ -1,3 +1,19 @@
+"""
+Example of a Langroid `DocChatAgent` equipped with a vector-store and LLM.
+
+This is a specialized agent that can ingest (chunk, embed, store in vector-DB)
+a collection of documents, and the LLM uses Retrieval Augmented Generation (RAG)
+to answer questions about the documents.
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/chat-agent-docs.py
+```
+
+For more explanation see
+[the Getting Started guide](https://langroid.github.io/langroid/quick-start/chat-agent-docs/).
+"""
 import typer
 from rich import print
 

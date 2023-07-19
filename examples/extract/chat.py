@@ -5,7 +5,10 @@ more structured output to include model quality:
 https://wandb.ai/darek/llmapps/reports/Using-LLMs-to-Extract-Structured-Data-OpenAI-Function-Calling-in-Action--Vmlldzo0Nzc0MzQ3
 
 Example usage, to use Langroid tool:
-python3 examples/basic/extract.py -nc
+
+```bash
+python3 examples/basic/extract.py
+```
 
 Use -f option to use OpenAI function calling API instead of Langroid tool.
 

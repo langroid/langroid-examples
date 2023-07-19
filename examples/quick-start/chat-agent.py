@@ -1,3 +1,17 @@
+"""
+This example shows how you can use Langroid to define a basic Agent
+encapsulating a chat LLM, and use it to set up an interactive chat session.
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/chat-agent.py
+```
+
+More details in the
+[Getting Started guide](https://langroid.github.io/langroid/quick-start/chat-agent/)
+"""
+
 import typer
 from rich import print
 

@@ -1,3 +1,30 @@
+"""
+Use Langroid to set up a collaboration among three agents:
+
+- `Processor`: needs to transform a list of positive numbers, does not know how to
+apply the transformations, and sends out each number so that one of two
+specialized agents apply the transformation. It is instructed to avoid getting a
+negative number.
+- `EvenHandler` only transforms even numbers, otherwise returns a negative number
+- `OddHandler` only transforms odd numbers, otherwise returns a negative number
+
+Since the `Processor` must avoid getting a negative number, it needs to
+specify a recipient for each number it sends out,
+using `TO[<recipient>]:` at the beginning of the message.
+
+However, the `Processor` often forgets to use this syntax, and in this situation
+the `RecipientValidator` Agent asks the `Processor` to clarify the intended recipient.
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/two-agent-chat-num-router.py
+```
+
+For more explanation, see the
+[Getting Started guide](https://langroid.github.io/langroid/quick-start/three-agent-chat-num-router/)
+"""
+
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig

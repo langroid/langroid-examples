@@ -1,6 +1,6 @@
 """
-Single agent to use to chat with a Retrieval-augmented LLM.
-Repeat: User asks question -> LLM answers.
+Full working example of a Langroid `DocChatAgent` that uses a Retrieval-augmented LLM
+to answer questions about a collection of documents.
 """
 import re
 import typer

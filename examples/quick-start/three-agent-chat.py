@@ -1,3 +1,23 @@
+"""
+Use Langroid to set up a collaboration among three agents:
+
+- `Student`: needs to write 4 key points about Language Model Training and
+Evaluation, and knows nothing about these topics. It can consult two expert Agents:
+- `TrainingExpert`: an expert on Language Model Training
+- `EvaluationExpert`: an expert on Language Model Evaluation
+
+To ensure that the `Student`'s message is handled by the correct expert, it
+is instructed to specify the intended recipient in the message using
+`TO[<recipient>]` syntax.
+
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/three-agent-chat.py
+```
+
+"""
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig

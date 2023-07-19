@@ -1,3 +1,23 @@
+"""
+A simple example of a Langroid Agent equipped with a Tool/function-calling.
+
+The Agent has a "secret" list of numbers in "mind", and the LLM's task is to
+find the smallest number in the list. The LLM can make use of the `ProbeTool`
+which takes a number as argument. The agent's `probe` method handles this tool,
+and returns the number of numbers in the list that are less than or equal to the
+number in the `ProbeTool` message.
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/chat-agent-tool.py
+```
+
+For more explanation see
+[the Getting Started guide](https://langroid.github.io/langroid/quick-start/chat-agent-tool/).
+"""
+
+
 import typer
 from rich import print
 from typing import List

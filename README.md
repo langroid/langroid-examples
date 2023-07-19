@@ -58,6 +58,13 @@ Typically, the examples are run as follows:
 ```bash
 python3 examples/quick-start/chat-agent.py
 ```
+Most of the scripts take additional flags:
+
+- `-nc` turn off cache retrieval for LLM responses, 
+    i.e., get fresh (rather than cached) responses each time you run it.
+- `-d` turns on debug mode, showing more detail such as prompts etc.
+- `-ns` turn off streaming output from the OpenAI API
+- `-f` use OpenAI function-calling instead of Langroid Tool mechanism (where applicable).
 
 All of the examples are best run on the command-line, preferably in a nice
 terminal like [Iterm2](https://iterm2.com/).

@@ -1,3 +1,22 @@
+"""
+Use Langroid to set up a collaboration among three agents:
+
+- `Processor`: needs to transform a list of numbers, does not know how to
+apply the transformations, and sends out each number so that one of two
+specialized agents apply the transformation.
+- `EvenHandler` only transforms even numbers, otherwise says `DO-NOT-KNOW`
+- `OddHandler` only transforms odd numbers, otherwise says `DO-NOT-KNOW`
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/three-agent-chat-num.py
+```
+
+For more explanation, see the
+[Getting Started guide](https://langroid.github.io/langroid/quick-start/three-agent-chat-num/)
+"""
+
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig

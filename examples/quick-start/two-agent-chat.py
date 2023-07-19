@@ -1,9 +1,20 @@
+"""
+A simple example of two agents collaborating on a task.
+
+The `Student` Agent is tasked with writing 3 key points on Language Models,
+  and it is told that it knows nothing about the topic, and
+  can consult an `Expert` Agent for help.
+
+Run as follows:
+
+```bash
+python3 examples/quick-start/two-agent-chat.py
+```
+
+"""
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.special.recipient_validator_agent import (
-    RecipientValidator, RecipientValidatorConfig
-)
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from langroid.utils.configuration import set_global, Settings

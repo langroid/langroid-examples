@@ -1,10 +1,11 @@
 """
 Two-agent chat with Retrieval-augmented LLM + function-call/tool.
-ExtractorAgent (has no access to docs) is tasked with extracting structured
+
+- `ExtractorAgent` (has no access to docs) is tasked with extracting structured
 information from a commercial lease document, and must present the terms in
 a specific nested JSON format.
-DocAgent (has access to the lease) helps answer questions about the lease.
-Repeat: WriterAgent --Question--> DocAgent --> Answer
+- `DocAgent` (has access to the lease) helps answer questions about the lease.
+
 
 Example:
 python3 examples/docqa/chat_multi_extract.py
