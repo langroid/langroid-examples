@@ -51,4 +51,15 @@ QDRANT_API_KEY=<your key>
 
 Currently only OpenAI models are supported. Others will be added later.
 
+## Running the examples
+
+Typically, the examples are run as follows:
+
+```bash
+python3 examples/quick-start/chat-agent.py
+```
+
+All of the examples are best run on the command-line, preferably in a nice
+terminal like [Iterm2](https://iterm2.com/).
+
 
