@@ -106,7 +106,7 @@ class CLIOptions(BaseSettings):
 def chat(opts: CLIOptions) -> None:
     doc_agent = DocChatAgent(
         DocChatAgentConfig(
-            summarize_prompt= f"""
+            summarize_prompt=f"""
                 Use the provided extracts  to answer the question. 
                 If there's not enough information, respond with {NO_ANSWER}. Use only the 
                 information in these extracts, even if your answer is factually incorrect, 

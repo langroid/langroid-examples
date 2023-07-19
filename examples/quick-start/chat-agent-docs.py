@@ -30,7 +30,7 @@ app = typer.Typer()
 setup_colored_logging()
 
 
-documents =[
+documents = [
     Document(
         content="""
             In the year 2050, GPT10 was released. 
@@ -69,9 +69,8 @@ def chat() -> None:
         """
     )
 
-
     config = DocChatAgentConfig(
-        llm = OpenAIGPTConfig(
+        llm=OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
         vecdb=VectorStoreConfig(
@@ -83,7 +82,7 @@ def chat() -> None:
             separators=["\n\n"],
             splitter=Splitter.SIMPLE,
             n_similar_docs=2,
-        )
+        ),
     )
     agent = DocChatAgent(config)
     agent.ingest_docs(documents)
@@ -93,9 +92,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     set_global(
         Settings(

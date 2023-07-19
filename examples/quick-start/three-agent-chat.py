@@ -20,7 +20,8 @@ import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.special.recipient_validator_agent import (
-    RecipientValidator, RecipientValidatorConfig
+    RecipientValidator,
+    RecipientValidatorConfig,
 )
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
@@ -35,15 +36,15 @@ setup_colored_logging()
 
 def chat() -> None:
     config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
+        llm=OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
-        vecdb = None,
+        vecdb=None,
     )
     student_agent = ChatAgent(config)
     student_task = Task(
         student_agent,
-        name = "Student",
+        name="Student",
         llm_delegate=True,
         single_round=False,
         system_message="""
@@ -64,7 +65,7 @@ def chat() -> None:
     training_expert_agent = ChatAgent(config)
     training_expert_task = Task(
         training_expert_agent,
-        name = "TrainingExpert",
+        name="TrainingExpert",
         system_message="""
         You are an expert on Training Language Models in Machine Learning. 
         You will receive questions on this topic, and you must answer these
@@ -77,7 +78,7 @@ def chat() -> None:
     evaluation_expert_agent = ChatAgent(config)
     evaluation_expert_task = Task(
         evaluation_expert_agent,
-        name = "EvaluationExpert",
+        name="EvaluationExpert",
         system_message="""
         You are an expert on Evaluating Language Models in Machine Learning. 
         You will receive questions on this topic, and you must answer these
@@ -101,9 +102,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     set_global(
         Settings(

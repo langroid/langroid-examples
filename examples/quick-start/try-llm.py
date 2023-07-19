@@ -16,12 +16,14 @@ from rich.prompt import Prompt
 from langroid.language_models.base import LLMMessage, Role
 from langroid.language_models.openai_gpt import (
     OpenAIGPT,
-    OpenAIChatModel, OpenAIGPTConfig
+    OpenAIChatModel,
+    OpenAIGPTConfig,
 )
 
 from langroid.utils.configuration import set_global, Settings
 
 app = typer.Typer()
+
 
 def chat() -> None:
     print("[blue]Welcome to langroid!")
@@ -51,9 +53,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     set_global(
         Settings(

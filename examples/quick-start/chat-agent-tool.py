@@ -32,6 +32,7 @@ app = typer.Typer()
 
 setup_colored_logging()
 
+
 class ProbeTool(ToolMessage):
     request: str = "probe"
     purpose: str = """
@@ -52,7 +53,7 @@ class SpyGameAgent(ChatAgent):
 
 
 class CLIOptions(BaseSettings):
-    fn_api: bool = False # whether to use OpenAI's function-calling
+    fn_api: bool = False  # whether to use OpenAI's function-calling
 
 
 def chat(opts: CLIOptions) -> None:
@@ -61,11 +62,11 @@ def chat(opts: CLIOptions) -> None:
         [blue]Welcome to the number guessing game!
         Enter x or q to quit
         """
-        )
+    )
     spy_game_agent = SpyGameAgent(
         ChatAgentConfig(
             name="Spy",
-            llm = OpenAIGPTConfig(
+            llm=OpenAIGPTConfig(
                 chat_model=OpenAIChatModel.GPT4,
             ),
             vecdb=None,
@@ -84,7 +85,7 @@ def chat(opts: CLIOptions) -> None:
             tell you how many of my numbers are equal or less than your number.
             Once you have found the smallest number,
             you can say DONE and report your answer.
-        """
+        """,
     )
     task.run()
 

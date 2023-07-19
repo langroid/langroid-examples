@@ -29,15 +29,15 @@ setup_colored_logging()
 
 def chat() -> None:
     config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
+        llm=OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
-        vecdb = None,
+        vecdb=None,
     )
     student_agent = ChatAgent(config)
     student_task = Task(
         student_agent,
-        name = "Student",
+        name="Student",
         system_message="""
         You will receive a list of numbers from me (the User),
         and your goal is to calculate their sum.
@@ -58,7 +58,7 @@ def chat() -> None:
     adder_agent = ChatAgent(config)
     adder_task = Task(
         adder_agent,
-        name = "Adder",
+        name="Adder",
         system_message="""
         You are an expert on addition of numbers. 
         When given numbers to add, simply return their sum, say nothing else
@@ -71,9 +71,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     set_global(
         Settings(

@@ -31,15 +31,15 @@ setup_colored_logging()
 
 def chat() -> None:
     config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
+        llm=OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
-        vecdb = None,
+        vecdb=None,
     )
     processor_agent = ChatAgent(config)
     processor_task = Task(
         processor_agent,
-        name = "Processor",
+        name="Processor",
         system_message="""
         You will receive a list of numbers from the user.
         Your goal is to apply a transformation to each number.
@@ -58,7 +58,7 @@ def chat() -> None:
     even_agent = ChatAgent(config)
     even_task = Task(
         even_agent,
-        name = "EvenHandler",
+        name="EvenHandler",
         system_message=f"""
         You will be given a number. 
         If it is even, divide by 2 and say the result, nothing else.
@@ -70,7 +70,7 @@ def chat() -> None:
     odd_agent = ChatAgent(config)
     odd_task = Task(
         odd_agent,
-        name = "OddHandler",
+        name="OddHandler",
         system_message=f"""
         You will be given a number n. 
         If it is odd, return (n*3+1), say nothing else. 
@@ -85,9 +85,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     set_global(
         Settings(

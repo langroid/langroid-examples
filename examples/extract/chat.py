@@ -31,10 +31,12 @@ app = typer.Typer()
 
 setup_colored_logging()
 
+
 class MethodQuality(BaseModel):
     """
     Structure we want to extract
     """
+
     name: str
     quality: str
 
@@ -121,7 +123,7 @@ def main(
     fn_api: bool = typer.Option(False, "--fn_api", "-f", help="use functions api"),
 ) -> None:
     config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
+        llm=OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
         use_functions_api=fn_api,
