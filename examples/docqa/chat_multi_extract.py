@@ -104,7 +104,25 @@ class CLIOptions(BaseSettings):
 
 
 def chat(opts: CLIOptions) -> None:
-    doc_agent = DocChatAgent(DocChatAgentConfig())
+    doc_agent = DocChatAgent(
+        DocChatAgentConfig(
+            summarize_prompt= f"""
+                Use the provided extracts  to answer the question. 
+                If there's not enough information, respond with {NO_ANSWER}. Use only the 
+                information in these extracts, even if your answer is factually incorrect, 
+                and even if the answer contradicts other parts of the document. The only 
+                important thing is that your answer is consistent with and supported by the 
+                extracts. Compose your complete answer and cite all supporting sources on a 
+                separate separate line as "EXTRACTS:".
+                Show each EXTRACT very COMPACTLY, i.e. only show a few words from
+                the start and end of the extract, for example: 
+                EXTRACT: "The world war started in ... Germany Surrendered"   
+                {{extracts}}
+                {{question}}
+                Answer:           
+            """
+        )
+    )
     doc_agent.vecdb.set_collection("docqa-chat-multi-extract", replace=True)
     print("[blue]Welcome to the real-estate info-extractor!")
     doc_agent.config.doc_paths = [
@@ -119,6 +137,8 @@ def chat(opts: CLIOptions) -> None:
         system_message="""You are an expert on Commercial Leases. 
         You will receive various questions about a Commercial 
         Lease contract, and your job is to answer them concisely in at most 2 sentences.
+        Please SUPPORT your answer with an actual EXTRACT from the lease,
+        showing only a few words from the  START and END of the extract. 
         """,
     )
 
