@@ -41,6 +41,14 @@ cp .env-template .env
 # now edit the .env file, insert your secrets as above
 ``` 
 
+Your `.env` file should look like this:
+```bash
+OPENAI_API_KEY=<your key>
+GITHUB_ACCESS_TOKEN=<your token>
+REDIS_PASSWORD=<your password>
+QDRANT_API_KEY=<your key>
+```
+
 Currently only OpenAI models are supported. Others will be added later.
 
 
