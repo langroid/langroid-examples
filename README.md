@@ -3,12 +3,9 @@
 Examples of using the [Langroid](https://github.com/langroid/langroid) 
 Multi-Agent Programming framework to build LLM applications.
 
-## Set up poetry env
+## Set up virtual env and install `langroid`
 
-Install [`poetry`](https://python-poetry.org/docs/#installation)
-and use Python 3.11.
-
-Create virtual env and install dependencies:
+Create a virtual env and install dependencies:
 
 ```bash
 # clone the repo and cd into repo root
@@ -21,9 +18,10 @@ python3 -m venv .venv
 # activate the virtual env
 . .venv/bin/activate
 
-# use poetry to install dependencies (these go into .venv dir)
-poetry install
+# alternatively, use pip to install langroid into your virtual env
+pip install langroid
 ```
+
 
 ## Set up environment variables (API keys, etc)
 
