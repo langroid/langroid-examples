@@ -5,8 +5,6 @@ Multi-Agent Programming framework to build LLM applications.
 
 ## Set up virtual env and install `langroid`
 
-Create a virtual env and install dependencies:
-
 ```bash
 # clone the repo and cd into repo root
 git clone https://github.com/langroid/langroid-examples.git
@@ -18,7 +16,6 @@ python3 -m venv .venv
 # activate the virtual env
 . .venv/bin/activate
 
-# alternatively, use pip to install langroid into your virtual env
 pip install langroid
 ```
 
