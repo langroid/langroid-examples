@@ -108,7 +108,7 @@ def chat(opts: CLIOptions) -> None:
     doc_agent.vecdb.set_collection("docqa-chat-multi-extract", replace=True)
     print("[blue]Welcome to the real-estate info-extractor!")
     doc_agent.config.doc_paths = [
-        "apps/docqa/lease.txt",
+        "examples/docqa/lease.txt",
     ]
     doc_agent.ingest()
     doc_task = Task(
