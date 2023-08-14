@@ -19,9 +19,7 @@ python3 examples/quick-start/three-agent-chat.py
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.special.recipient_validator_agent import (
-    RecipientValidator, RecipientValidatorConfig
-)
+from langroid.agent.tools.recipient_tool import RecipientTool
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from langroid.utils.configuration import set_global, Settings
@@ -41,6 +39,7 @@ def chat() -> None:
         vecdb = None,
     )
     student_agent = ChatAgent(config)
+    student_agent.enable_message(RecipientTool)
     student_task = Task(
         student_agent,
         name = "Student",
@@ -55,8 +54,10 @@ def chat() -> None:
         TrainingExpert and EvaluationExpert.
         You will ask ONE question at a time, to ONE of these experts. 
         To clarify who your question is for, you must use 
-        "TO[<recipient>]:" at the start of your message,
-        where <recipient> is either TrainingExpert or EvaluationExpert.
+        the `recipient_message` tool/function-call, setting 
+        the `content` field to the question you want to ask, and the
+        `recipient` field to either TrainingExpert or EvaluationExpert.
+
         Once you have collected the points you need,
         say DONE, and show me the 4 bullet points. 
         """,
@@ -87,14 +88,8 @@ def chat() -> None:
         single_round=True,  # task done after 1 step() with valid response
     )
 
-    validator_agent = RecipientValidator(
-        RecipientValidatorConfig(
-            recipients=["TrainingExpert", "EvaluationExpert"],
-        )
-    )
-    validator_task = Task(validator_agent, single_round=True)
     student_task.add_sub_task(
-        [validator_task, training_expert_task, evaluation_expert_task]
+        [training_expert_task, evaluation_expert_task]
     )
     student_task.run()
 
