@@ -10,10 +10,12 @@ negative number.
 
 Since the Processor must avoid getting a negative number, it needs to
 specify a recipient for each number it sends out,
-using TO[<recipient>]: at the beginning of the message.
+using the `recipient_message` tool/function-call, where the `content` field
+is the number it wants to send, and the `recipient` field is the name
+of the intended recipient, either "EvenHandler" or "OddHandler".
 
-However, the Processor often forgets to use this syntax, and in this situation
-the RecipientValidator Agent asks the Processor to clarify the intended recipient.
+This tool/function-call also has built-in mechanisms to remind the LLM
+to specify a recipient if it forgets to do so.
 
 Run as follows:
 
@@ -26,9 +28,7 @@ For more explanation, see the
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.special.recipient_validator_agent import (
-    RecipientValidator, RecipientValidatorConfig
-)
+from langroid.agent.tools.recipient_tool import RecipientTool
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from langroid.utils.configuration import set_global, Settings
@@ -40,14 +40,17 @@ app = typer.Typer()
 setup_colored_logging()
 
 
-def chat() -> None:
+def chat(tools:bool=False) -> None:
     config = ChatAgentConfig(
         llm = OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
+        use_tools = tools,
+        use_functions_api = not tools,
         vecdb = None,
     )
     processor_agent = ChatAgent(config)
+    processor_agent.enable_message(RecipientTool)
     processor_task = Task(
         processor_agent,
         name = "Processor",
@@ -65,9 +68,10 @@ def chat() -> None:
         The handlers will transform the number and give you a new number.        
         If you send it to the wrong person, you will receive a negative value.
         Your aim is to never get a negative number, so you must 
-        clearly specify who you are sending the number to, by starting 
-        your message with "TO[EvenHandler]:" or "TO[OddHandler]:".
-        For example, you could say "TO[EvenHandler]: 4".
+        clearly specify who you are sending the number to, using the
+        `recipient_message` tool/function-call, where the `content` field
+        is the number you want to send, and the `recipient` field is the name
+        of the intended recipient, either "EvenHandler" or "OddHandler".
         
         Once all numbers in the given list have been transformed, 
         say DONE and show me the result. 
@@ -99,14 +103,8 @@ def chat() -> None:
         """,
         single_round=True,  # task done after 1 step() with valid response
     )
-    validator_agent = RecipientValidator(
-        RecipientValidatorConfig(
-            recipients=["EvenHandler", "OddHandler"],
-        )
-    )
-    validator_task = Task(validator_agent, single_round=True)
 
-    processor_task.add_sub_task([validator_task, even_task, odd_task])
+    processor_task.add_sub_task([even_task, odd_task])
     processor_task.run()
 
 
@@ -115,6 +113,9 @@ def main(
         debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
         no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
         nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+        tools: bool = typer.Option(
+            False, "--tools", "-t",
+            help="use langroid tools instead of OpenAI function-calling"),
 ) -> None:
     set_global(
         Settings(
@@ -123,7 +124,7 @@ def main(
             stream=not no_stream,
         )
     )
-    chat()
+    chat(tools)
 
 
 if __name__ == "__main__":
