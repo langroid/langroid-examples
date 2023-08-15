@@ -68,10 +68,7 @@ def chat(tools:bool=False) -> None:
         The handlers will transform the number and give you a new number.        
         If you send it to the wrong person, you will receive a negative value.
         Your aim is to never get a negative number, so you must 
-        clearly specify who you are sending the number to, using the
-        `recipient_message` tool/function-call, where the `content` field
-        is the number you want to send, and the `recipient` field is the name
-        of the intended recipient, either "EvenHandler" or "OddHandler".
+        clearly specify who you are sending the number to.
         
         Once all numbers in the given list have been transformed, 
         say DONE and show me the result. 

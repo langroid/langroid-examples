@@ -9,7 +9,7 @@ packages = [{include = "examples"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-langroid = "^0.1.48"
+langroid = "^0.1.49"
 
 
 [build-system]
