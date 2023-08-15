@@ -112,3 +112,24 @@ All of the examples are best run on the command-line, preferably in a nice
 terminal like [Iterm2](https://iterm2.com/).
 
 
+## Docker Instructions
+
+We provide a containerized version of this repo via this [Docker Image](https://hub.docker.com/r/langroid/langroid).
+All you need to do is set up environment variables in the `.env` file.
+Please follow these steps to setup the container:
+
+```bash
+# get the .env file template from `langroid` repo
+wget https://github.com/langroid/langroid/blob/main/.env-template .env
+
+# Edit the .env file with your favorite editor (here nano):
+# add API keys as explained above
+nano .env
+
+# launch the container
+docker run -it  -v ./.env:/.env langroid/langroid
+
+# Use this command to run any of the examples
+python examples/<Path/To/Example.py> 
+``` 
+</details>
