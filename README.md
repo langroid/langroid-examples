@@ -5,6 +5,8 @@ Multi-Agent Programming framework to build LLM applications.
 
 ## Set up virtual env and install `langroid`
 
+IMPORTANT: Please ensure you are using Python 3.11+
+
 ```bash
 # clone the repo and cd into repo root
 git clone https://github.com/langroid/langroid-examples.git
