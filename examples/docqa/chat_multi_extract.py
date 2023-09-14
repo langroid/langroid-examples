@@ -1,11 +1,10 @@
 """
 Two-agent chat with Retrieval-augmented LLM + function-call/tool.
-
-- ExtractorAgent (has no access to docs) is tasked with extracting structured
+ExtractorAgent (has no access to docs) is tasked with extracting structured
 information from a commercial lease document, and must present the terms in
 a specific nested JSON format.
-- DocAgent (has access to the lease) helps answer questions about the lease.
-
+DocAgent (has access to the lease) helps answer questions about the lease.
+Repeat: WriterAgent --Question--> DocAgent --> Answer
 
 Example:
 python3 examples/docqa/chat_multi_extract.py
@@ -17,8 +16,10 @@ from rich import print
 from pydantic import BaseModel, BaseSettings
 from typing import List
 import json
+import os
 
 from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
+from langroid.parsing.parser import ParsingConfig
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.task import Task
 from langroid.agent.tool_message import ToolMessage
@@ -30,6 +31,7 @@ from langroid.utils.constants import NO_ANSWER
 app = typer.Typer()
 
 setup_colored_logging()
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 class LeasePeriod(BaseModel):
@@ -106,21 +108,12 @@ class CLIOptions(BaseSettings):
 def chat(opts: CLIOptions) -> None:
     doc_agent = DocChatAgent(
         DocChatAgentConfig(
-            summarize_prompt= f"""
-                Use the provided extracts  to answer the question. 
-                If there's not enough information, respond with {NO_ANSWER}. Use only the 
-                information in these extracts, even if your answer is factually incorrect, 
-                and even if the answer contradicts other parts of the document. The only 
-                important thing is that your answer is consistent with and supported by the 
-                extracts. Compose your complete answer and cite all supporting sources on a 
-                separate separate line as "EXTRACTS:".
-                Show each EXTRACT very COMPACTLY, i.e. only show a few words from
-                the start and end of the extract, for example: 
-                EXTRACT: "The world war started in ... Germany Surrendered"   
-                {{extracts}}
-                {{question}}
-                Answer:           
-            """
+            parsing=ParsingConfig(
+                chunk_size=100,
+                overlap=20,
+                n_similar_docs=4,
+            ),
+            cross_encoder_reranking_model="",
         )
     )
     doc_agent.vecdb.set_collection("docqa-chat-multi-extract", replace=True)
@@ -137,8 +130,6 @@ def chat(opts: CLIOptions) -> None:
         system_message="""You are an expert on Commercial Leases. 
         You will receive various questions about a Commercial 
         Lease contract, and your job is to answer them concisely in at most 2 sentences.
-        Please SUPPORT your answer with an actual EXTRACT from the lease,
-        showing only a few words from the  START and END of the extract. 
         """,
     )
 
@@ -147,6 +138,7 @@ def chat(opts: CLIOptions) -> None:
             llm=OpenAIGPTConfig(),
             use_functions_api=opts.fn_api,
             use_tools=not opts.fn_api,
+            vecdb=None,
         )
     )
     lease_extractor_agent.enable_message(
@@ -167,7 +159,9 @@ def chat(opts: CLIOptions) -> None:
         question. You only need to collect info corresponding to the fields in this 
         example:
         {LeaseMessage.usage_example()}
-        If some info cannot be found, fill in {NO_ANSWER}.
+        If I am unable to answer your question initially, try asking me 
+        differently. If I am still unable to answer after 3 tries, fill in 
+        {NO_ANSWER} for that field.
         When you have collected this info, present it to me using the 
         'lease_info' function/tool.
         """,
@@ -181,6 +175,9 @@ def main(
     debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
     nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
     fn_api: bool = typer.Option(False, "--fn_api", "-f", help="use functions api"),
+    cache_type: str = typer.Option(
+        "redis", "--cachetype", "-ct", help="redis or momento"
+    ),
 ) -> None:
     cli_opts = CLIOptions(
         fn_api=fn_api,
@@ -189,6 +186,7 @@ def main(
         Settings(
             debug=debug,
             cache=not nocache,
+            cache_type=cache_type,
         )
     )
     chat(cli_opts)
