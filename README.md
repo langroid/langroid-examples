@@ -18,7 +18,11 @@ python3 -m venv .venv
 # activate the virtual env
 . .venv/bin/activate
 
-pip install langroid
+# install with `hf-embeddings` extra to be able to use sentence_transformers embeddings
+pip install "langroid[hf-embeddings]"
+
+# or to update an existing installation:
+pip install --upgrade "langroid[hf-embeddings]"
 ```
 
 
