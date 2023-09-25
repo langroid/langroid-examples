@@ -5,7 +5,9 @@ Multi-Agent Programming framework to build LLM applications.
 
 ## Set up virtual env and install `langroid`
 
-IMPORTANT: Please ensure you are using Python 3.11+
+IMPORTANT: Please ensure you are using Python 3.11+. If you are using poetry,
+you may be able to just run `poetry env use 3.11` if you have Python 3.11 available in your system.
+
 
 ```bash
 # clone the repo and cd into repo root
@@ -18,11 +20,14 @@ python3 -m venv .venv
 # activate the virtual env
 . .venv/bin/activate
 
-# install with `hf-embeddings` extra to be able to use sentence_transformers embeddings
-pip install "langroid[hf-embeddings]"
+# install dependencies from pyproject.toml:
+# This install langroid with extras.
+poetry install 
+# or equivalently:
+# pip install "langroid[hf-embeddings,postgres,mysql]"
 
 # or to update an existing installation:
-pip install --upgrade "langroid[hf-embeddings]"
+pip install --upgrade "langroid[hf-embeddings,postgres,mysql]"
 ```
 
 

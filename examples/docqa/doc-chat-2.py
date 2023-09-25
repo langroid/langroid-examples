@@ -1,8 +1,13 @@
 """
-Single agent to use to chat with a Retrieval-augmented LLM.
-Repeat: User asks question -> LLM answers.
+2-agent doc-chat:
+WriterAgent is in charge of answering user's question.
+Breaks it down into smaller questions (if needed) to send to DocAgent,
+who has access to the docs via a vector-db.
+
+Run like this:
+python3 examples/docqa/doc-chat-2.py
+
 """
-import re
 import typer
 from rich import print
 from rich.prompt import Prompt
@@ -13,10 +18,14 @@ from langroid.agent.special.doc_chat_agent import (
     DocChatAgentConfig,
 )
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
+from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.task import Task
+from langroid.language_models.openai_gpt import OpenAIGPTConfig
+from langroid.agent.tools.recipient_tool import RecipientTool
 from langroid.parsing.urls import get_list_from_user
 from langroid.utils.configuration import set_global, Settings
 from langroid.utils.logging import setup_colored_logging
+from langroid.utils.constants import NO_ANSWER
 
 app = typer.Typer()
 
@@ -25,9 +34,9 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 def chat(config: DocChatAgentConfig) -> None:
-    agent = DocChatAgent(config)
-    n_deletes = agent.vecdb.clear_empty_collections()
-    collections = agent.vecdb.list_collections()
+    doc_agent = DocChatAgent(config)
+    n_deletes = doc_agent.vecdb.clear_empty_collections()
+    collections = doc_agent.vecdb.list_collections()
     collection_name = "NEW"
     is_new_collection = False
     replace_collection = False
@@ -57,7 +66,7 @@ def chat(config: DocChatAgentConfig) -> None:
                 default="n",
             )
             if confirm == "y":
-                agent.vecdb.clear_all_collections(really=True)
+                doc_agent.vecdb.clear_all_collections(really=True)
                 collection_name = "NEW"
 
         if int(choice) > 0:
@@ -74,10 +83,10 @@ def chat(config: DocChatAgentConfig) -> None:
         is_new_collection = True
         collection_name = Prompt.ask(
             "What would you like to name the NEW collection?",
-            default="doc-chat",
+            default="doc-chat-2",
         )
 
-    agent.vecdb.set_collection(collection_name, replace=replace_collection)
+    doc_agent.vecdb.set_collection(collection_name, replace=replace_collection)
 
     print("[blue]Welcome to the document chatbot!")
     print("[cyan]Enter x or q to quit, or ? for evidence")
@@ -87,24 +96,64 @@ def chat(config: DocChatAgentConfig) -> None:
     if len(inputs) == 0:
         if is_new_collection:
             inputs = config.default_paths
-    agent.config.doc_paths = inputs
-    agent.ingest()
-    system_msg = Prompt.ask(
-        """
-    [blue] Tell me who I am; complete this sentence: You are...
-    [or hit enter for default] 
-    [blue] Human
-    """,
-        default="a helpful assistant.",
-    )
-    system_msg = re.sub("you are", "", system_msg, flags=re.IGNORECASE)
-    task = Task(
-        agent,
+    doc_agent.config.doc_paths = inputs
+    doc_agent.ingest()
+
+    doc_task = Task(
+        doc_agent,
+        name="DocAgent",
         llm_delegate=False,
-        single_round=False,
-        system_message="You are " + system_msg,
+        single_round=True,
     )
-    task.run()
+
+    writer_agent = ChatAgent(
+        ChatAgentConfig(
+            name="WriterAgent",
+            llm=OpenAIGPTConfig(),
+            vecdb=None,
+        )
+    )
+    writer_agent.enable_message(RecipientTool)
+    writer_task = Task(
+        writer_agent,
+        name="WriterAgent",
+        llm_delegate=True,
+        single_round=False,
+        system_message=f"""
+        You are tenacious, creative and resourceful when given a question to 
+        find an answer for. You will receive questions from a user, which you will 
+        try to answer ONLY based on content from certain documents (not from your 
+        general knowledge). However you do NOT have access to the documents. 
+        You will be assisted by DocAgent, who DOES have access to the documents.
+        
+        Here are the rules:
+        (a) when the question is complex or has multiple parts, break it into small 
+         parts and/or steps and send them to DocAgent
+        (b) if DocAgent says {NO_ANSWER} or gives no answer, try asking in other ways.
+        (c) Once you collect all parts of the answer, you can say DONE and give me 
+            the final answer. 
+        (d) DocAgent has no memory of previous dialog, so you must ensure your 
+            questions are stand-alone questions that don't refer to entities mentioned 
+            earlier in the dialog.
+        (e) if DocAgent is unable to answer after your best efforts, you can say
+            {NO_ANSWER} and move on to the next question.
+        (f) answers should be based ONLY on the documents, NOT on your prior knowledge.
+        (g) be direct and concise, do not waste words being polite.
+        (h) if you need more info from the user, before asking DocAgent, you should 
+        address questions to the "User" (not to DocAgent) to get further 
+        clarifications or information. 
+        (i) Always ask questions ONE BY ONE (to either User or DocAgent), NEVER 
+            send Multiple questions in one message.
+        (j) Use bullet-point format when presenting multiple pieces of info.
+        (k) When DocAgent responds without citing a SOURCE and EXTRACT(S), you should
+            send your question again to DocChat, reminding it to cite the source and
+            extract(s).
+        
+        Start by asking the user what they want to know.
+        """,
+    )
+    writer_task.add_sub_task(doc_task)
+    writer_task.run()
 
 
 @app.command()
@@ -119,16 +168,17 @@ def main(
         n_query_rephrases=0,
         cross_encoder_reranking_model="cross-encoder/ms-marco-MiniLM-L-6-v2",
         hypothetical_answer=False,
+        assistant_mode=True,
         parsing=ParsingConfig(  # modify as needed
             splitter=Splitter.TOKENS,
-            chunk_size=1000,  # aim for this many tokens per chunk
-            overlap=100,  # overlap between chunks
+            chunk_size=500,  # aim for this many tokens per chunk
+            overlap=200,  # overlap between chunks
             max_chunks=10_000,
             # aim to have at least this many chars per chunk when
             # truncating due to punctuation
             min_chunk_chars=200,
             discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-            n_similar_docs=3,
+            n_similar_docs=5,
             # NOTE: PDF parsing is extremely challenging, each library has its own
             # strengths and weaknesses. Try one that works for your use case.
             pdf=PdfParsingConfig(
