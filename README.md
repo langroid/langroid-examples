@@ -18,11 +18,14 @@ python3 -m venv .venv
 # activate the virtual env
 . .venv/bin/activate
 
-# install with `hf-embeddings` extra to be able to use sentence_transformers embeddings
-pip install "langroid[hf-embeddings]"
+# install dependencies from pyproject.toml:
+# This install langroid with extras.
+poetry install 
+# or equivalently:
+# pip install "langroid[hf-embeddings,postgres,mysql]"
 
 # or to update an existing installation:
-pip install --upgrade "langroid[hf-embeddings]"
+pip install --upgrade "langroid[hf-embeddings,postgres,mysql]"
 ```
 
 
