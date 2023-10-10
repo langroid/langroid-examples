@@ -32,7 +32,7 @@ def chat() -> None:
 
     mdl = OpenAIGPT(cfg)
     messages = [
-        LLMMessage(role=Role.SYSTEM, content="You are a helpful assitant"),
+        LLMMessage(role=Role.SYSTEM, content="You are a helpful assistant"),
     ]
     while True:
         message = Prompt.ask("[blue]Human")
