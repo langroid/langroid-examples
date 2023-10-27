@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+.logs/
+logs/
+.idea/
+.qdrant/
+.DS_Store
+poetry.lock
+
 # Distribution / packaging
 .Python
 build/
@@ -130,3 +137,8 @@ dmypy.json
 
 
 .vscode
+
+# Emacs
+*~
+\#*\#
+.\#*

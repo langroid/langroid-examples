@@ -13,16 +13,11 @@ More details in the
 import typer
 from rich import print
 
-from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.task import Task
-from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
-
+import langroid as lr
 
 app = typer.Typer()
 
-setup_colored_logging()
+lr.utils.logging.setup_colored_logging()
 
 
 def chat() -> None:
@@ -32,14 +27,14 @@ def chat() -> None:
         Enter x or q to quit
         """
         )
-    config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
-            chat_model=OpenAIChatModel.GPT4,
+    config = lr.ChatAgentConfig(
+        llm = lr.language_models.OpenAIGPTConfig(
+            chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
         vecdb=None,
     )
-    agent = ChatAgent(config)
-    task = Task(agent, name="Bot")
+    agent = lr.ChatAgent(config)
+    task = lr.Task(agent, name="Bot")
     task.run()
 
 
@@ -49,8 +44,8 @@ def main(
     no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
     nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,

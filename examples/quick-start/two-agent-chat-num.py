@@ -15,27 +15,22 @@ For more explanation see the
 
 import typer
 
-from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.task import Task
-from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
-
+import langroid as lr
 
 app = typer.Typer()
 
-setup_colored_logging()
+lr.utils.logging.setup_colored_logging()
 
 
 def chat() -> None:
-    config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
-            chat_model=OpenAIChatModel.GPT4,
+    config = lr.ChatAgentConfig(
+        llm = lr.language_models.OpenAIGPTConfig(
+            chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
-        vecdb = None,
+        vecdb=None,
     )
-    student_agent = ChatAgent(config)
-    student_task = Task(
+    student_agent = lr.ChatAgent(config)
+    student_task = lr.Task(
         student_agent,
         name = "Student",
         system_message="""
@@ -55,8 +50,8 @@ def chat() -> None:
         llm_delegate=True,
         single_round=False,
     )
-    adder_agent = ChatAgent(config)
-    adder_task = Task(
+    adder_agent = lr.ChatAgent(config)
+    adder_task = lr.Task(
         adder_agent,
         name = "Adder",
         system_message="""
@@ -75,8 +70,8 @@ def main(
         no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
         nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,

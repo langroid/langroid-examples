@@ -13,24 +13,21 @@ import typer
 from rich import print
 from rich.prompt import Prompt
 
-from langroid.language_models.base import LLMMessage, Role
-from langroid.language_models.openai_gpt import (
-    OpenAIGPT,
-    OpenAIChatModel, OpenAIGPTConfig
-)
+import langroid as lr
 
-from langroid.utils.configuration import set_global, Settings
+Role = lr.language_models.Role
+LLMMessage = lr.language_models.LLMMessage
 
 app = typer.Typer()
 
 def chat() -> None:
     print("[blue]Welcome to langroid!")
 
-    cfg = OpenAIGPTConfig(
-        chat_model=OpenAIChatModel.GPT4,
+    cfg = lr.language_models.OpenAIGPTConfig(
+        chat_model=lr.language_models.OpenAIChatModel.GPT4,
     )
 
-    mdl = OpenAIGPT(cfg)
+    mdl = lr.language_models.OpenAIGPT(cfg)
     messages = [
         LLMMessage(role=Role.SYSTEM, content="You are a helpful assitant"),
     ]
@@ -55,8 +52,8 @@ def main(
         no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
         nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,

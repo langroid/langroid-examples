@@ -18,21 +18,15 @@ For more explanation see
 
 import typer
 from rich import print
-from typing import List
 from pydantic import BaseSettings
-from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.task import Task
-from langroid.agent.tool_message import ToolMessage
-from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
 
+import langroid as lr
 
 app = typer.Typer()
 
-setup_colored_logging()
+lr.utils.logging.setup_colored_logging()
 
-class ProbeTool(ToolMessage):
+class ProbeTool(lr.agent.ToolMessage):
     request: str = "probe"
     purpose: str = """
         To find how many numbers in my list are less than or equal to  
@@ -41,8 +35,8 @@ class ProbeTool(ToolMessage):
     number: int
 
 
-class SpyGameAgent(ChatAgent):
-    def __init__(self, config: ChatAgentConfig):
+class SpyGameAgent(lr.ChatAgent):
+    def __init__(self, config: lr.ChatAgentConfig):
         super().__init__(config)
         self.numbers = [3, 4, 8, 11, 15]
 
@@ -63,10 +57,10 @@ def chat(opts: CLIOptions) -> None:
         """
         )
     spy_game_agent = SpyGameAgent(
-        ChatAgentConfig(
+        lr.ChatAgentConfig(
             name="Spy",
-            llm = OpenAIGPTConfig(
-                chat_model=OpenAIChatModel.GPT4,
+            llm = lr.language_models.OpenAIGPTConfig(
+                chat_model=lr.language_models.OpenAIChatModel.GPT4,
             ),
             vecdb=None,
             use_tools=not opts.fn_api,
@@ -75,7 +69,7 @@ def chat(opts: CLIOptions) -> None:
     )
 
     spy_game_agent.enable_message(ProbeTool)
-    task = Task(
+    task = lr.Task(
         spy_game_agent,
         system_message="""
             I have a list of numbers between 1 and 20.
@@ -96,8 +90,8 @@ def main(
     nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
     fn_api: bool = typer.Option(False, "--fn_api", "-f", help="use functions api"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,
