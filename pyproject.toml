@@ -12,6 +12,7 @@ python = ">=3.11,<3.12"
 langroid = {version="^0.1.108", extras = ["hf-embeddings", "postgres", "mysql"]}
 
 
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -14,24 +14,15 @@ For more explanation see
 """
 import typer
 from rich import print
-
-from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
-from langroid.vector_store.base import VectorStoreConfig
-from langroid.agent.task import Task
-from langroid.parsing.parser import Parser, Splitter, ParsingConfig
-from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
-from langroid.mytypes import Document, DocMetaData
-
+import langroid as lr
 
 app = typer.Typer()
 
-setup_colored_logging()
+lr.utils.logging.setup_colored_logging()
 
 
 documents =[
-    Document(
+    lr.mytypes.Document(
         content="""
             In the year 2050, GPT10 was released. 
             
@@ -46,9 +37,9 @@ documents =[
             
             There was one more ice age in 2040.
             """,
-        metadata=DocMetaData(source="wikipedia-2063"),
+        metadata=lr.mytypes.DocMetaData(source="wikipedia-2063"),
     ),
-    Document(
+    lr.mytypes.Document(
         content="""
             We are living in an alternate universe 
             where Germany has occupied the USA, and the capital of USA is Berlin.
@@ -56,7 +47,7 @@ documents =[
             Charlie Chaplin was a great comedian.
             In 2050, all Asian merged into Indonesia.
             """,
-        metadata=DocMetaData(source="Almanac"),
+        metadata=lr.mytypes.DocMetaData(source="Almanac"),
     ),
 ]
 
@@ -70,24 +61,23 @@ def chat() -> None:
     )
 
 
-    config = DocChatAgentConfig(
-        llm = OpenAIGPTConfig(
-            chat_model=OpenAIChatModel.GPT4,
+    config = lr.agent.special.DocChatAgentConfig(
+        llm = lr.language_models.OpenAIGPTConfig(
+            chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
-        vecdb=VectorStoreConfig(
-            type="qdrant",
+        vecdb=lr.vector_store.QdrantDBConfig(
             collection_name="quick-start-chat-agent-docs",
             replace_collection=True,
         ),
-        parsing=ParsingConfig(
+        parsing=lr.parsing.parser.ParsingConfig(
             separators=["\n\n"],
-            splitter=Splitter.SIMPLE,
+            splitter=lr.parsing.parser.Splitter.SIMPLE,
             n_similar_docs=2,
         )
     )
-    agent = DocChatAgent(config)
+    agent = lr.agent.special.DocChatAgent(config)
     agent.ingest_docs(documents)
-    task = Task(agent)
+    task = lr.Task(agent)
     task.run()
 
 
@@ -97,8 +87,8 @@ def main(
         no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
         nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,

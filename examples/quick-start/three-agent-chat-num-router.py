@@ -26,32 +26,25 @@ For more explanation, see the
 """
 
 import typer
-
-from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.tools.recipient_tool import RecipientTool
-from langroid.agent.task import Task
-from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
-
+import langroid as lr
 
 app = typer.Typer()
 
-setup_colored_logging()
+lr.utils.logging.setup_colored_logging()
 
 
 def chat(tools:bool=False) -> None:
-    config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
-            chat_model=OpenAIChatModel.GPT4,
+    config = lr.ChatAgentConfig(
+        llm = lr.language_models.OpenAIGPTConfig(
+            chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
         use_tools = tools,
         use_functions_api = not tools,
         vecdb = None,
     )
-    processor_agent = ChatAgent(config)
-    processor_agent.enable_message(RecipientTool)
-    processor_task = Task(
+    processor_agent = lr.ChatAgent(config)
+    processor_agent.enable_message(lr.agent.tools.RecipientTool)
+    processor_task = lr.Task(
         processor_agent,
         name = "Processor",
         system_message="""
@@ -77,8 +70,8 @@ def chat(tools:bool=False) -> None:
         llm_delegate=True,
         single_round=False,
     )
-    even_agent = ChatAgent(config)
-    even_task = Task(
+    even_agent = lr.ChatAgent(config)
+    even_task = lr.Task(
         even_agent,
         name = "EvenHandler",
         system_message="""
@@ -89,8 +82,8 @@ def chat(tools:bool=False) -> None:
         single_round=True,  # task done after 1 step() with valid response
     )
 
-    odd_agent = ChatAgent(config)
-    odd_task = Task(
+    odd_agent = lr.ChatAgent(config)
+    odd_task = lr.Task(
         odd_agent,
         name = "OddHandler",
         system_message="""
@@ -114,8 +107,8 @@ def main(
             False, "--tools", "-t",
             help="use langroid tools instead of OpenAI function-calling"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,

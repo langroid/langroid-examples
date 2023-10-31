@@ -16,28 +16,23 @@ For more explanation, see the
 """
 
 import typer
-
-from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.task import Task
-from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
-from langroid.utils.constants import NO_ANSWER
+import langroid as lr
 
 app = typer.Typer()
 
-setup_colored_logging()
+lr.utils.logging.setup_colored_logging()
 
+NO_ANSWER = lr.utils.constants.NO_ANSWER
 
 def chat() -> None:
-    config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
-            chat_model=OpenAIChatModel.GPT4,
+    config = lr.ChatAgentConfig(
+        llm = lr.language_models.OpenAIGPTConfig(
+            chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
-        vecdb = None,
+        vecdb=None,
     )
-    processor_agent = ChatAgent(config)
-    processor_task = Task(
+    processor_agent = lr.ChatAgent(config)
+    processor_task = lr.Task(
         processor_agent,
         name = "Processor",
         system_message="""
@@ -55,8 +50,8 @@ def chat() -> None:
         llm_delegate=True,
         single_round=False,
     )
-    even_agent = ChatAgent(config)
-    even_task = Task(
+    even_agent = lr.ChatAgent(config)
+    even_task = lr.Task(
         even_agent,
         name = "EvenHandler",
         system_message=f"""
@@ -67,8 +62,8 @@ def chat() -> None:
         single_round=True,  # task done after 1 step() with valid response
     )
 
-    odd_agent = ChatAgent(config)
-    odd_task = Task(
+    odd_agent = lr.ChatAgent(config)
+    odd_task = lr.Task(
         odd_agent,
         name = "OddHandler",
         system_message=f"""
@@ -89,8 +84,8 @@ def main(
         no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
         nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
-    set_global(
-        Settings(
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
             debug=debug,
             cache=not nocache,
             stream=not no_stream,
