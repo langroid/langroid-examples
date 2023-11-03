@@ -1,0 +1,22 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is made and entered into by and between QuickTech Innovations Inc. ("Company") and Jamie Fox ("Employee"). The Employee is engaged to commence employment on January 1, 2024, in the role of Senior Software Developer. Throughout their tenure, the Employee is to commit fully to their designated duties and adhere to all Company policies. The Employee is expected to bring their full professional focus and efforts to the Company. This Agreement outlines an initial term of employment, which, while finite, may be subject to changes under certain conditions.
+
+The Employee will be compensated with an annual salary of $120,000, paid in bi-weekly installments. In addition to the salary, the Employee may receive bonuses and other forms of incentive compensation, the conditions of which are documented separately. Employee benefits, including health insurance and retirement plans, will be provided as per Company policy and may be modified from time to time. While compensation is a critical component, this Agreement also contemplates circumstances under which the relationship may evolve or conclude.
+
+Either the Employee or the Company can terminate this Agreement with a 30-day written notice. In specific scenarios where the Company terminates for cause, the Employee may forfeit entitlements to certain benefits. Conversely, should the Employee decide to terminate their employment without cause, this action could affect their post-employment benefits. The Company also retains the right to terminate without cause, subject to the provision of severance as per Company policy. The next section details the measures in place following the cessation of the employment period.
+
+Note that these may be modified by mutual agreement between the Employee and the Company.
+Employees. Health benefits will continue to be paid for a period of up to 3 months, or until the Employee finds new coverage, whichever comes first. There will be a one-time payment of $20,000. However, if the Employee engages in any activity that is in direct competition with the Company, the Employee will forfeit this payment.
+
+Regular performance evaluations will be conducted to ensure the Employee meets the Company's expectations. The duties assigned to the Employee are subject to business needs and can be modified at the Company's discretion. This Agreement is designed to clarify the employment relationship but is not an assurance of perpetual employment. It may only be amended through written agreement by both parties, thus establishing a clear structure for employment terms and future adjustments.
+
+Employees are expected to work from the office located in NYC at least 3 days a week. Exceptions
+related to family or health emergencies or health need to be discussed with their supervisor.
+The Company recognizes that work-life balance is important and encourages employees to take
+time off to recharge. There is no official vacation policy, although employees are expected to take at least 20 days off per year. We trust our employees to manage their time and take time off when they need it.
+The Company will provide the Employee with a laptop and other equipment necessary to perform their duties.
+
+The Employee's adherence to performance standards will be assessed through annual reviews. These evaluations are critical for determining eligibility for certain benefits, including potential salary adjustments and bonus allocations. As the Company evolves, so may the Employee's role, with responsibilities potentially being revised to align with the Company's strategic direction. Below are some expectations from employees when their role changes.
+
+They must clearly document their work so others can easily continue it or collaborate with them. They should be available to answer any questions about their work. They should be willing to do a code walk-thru when asked by a colleague.
