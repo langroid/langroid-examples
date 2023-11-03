@@ -81,14 +81,6 @@ def main(
     n_keys = len(list(store.yield_keys()))
     print(f"Indexed {n_keys} chunks")
 
-    sub_docs = vectorstore.similarity_search(query)
-    n_sub_docs = len(sub_docs)
-    print(f"Found {n_sub_docs} sub-documents")
-
-    retrieved_docs = big_chunks_retriever.get_relevant_documents(query)
-    n_retrieved_docs = len(retrieved_docs)
-    print(f"Retrieved {n_retrieved_docs} parent documents")
-
     from langchain.chains import RetrievalQA
 
     llm = ChatOpenAI(temperature=0, model_name="gpt-4")

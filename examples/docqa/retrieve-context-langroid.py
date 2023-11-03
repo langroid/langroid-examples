@@ -39,7 +39,7 @@ def main(
         path="examples/docqa/employment.txt",
         #query= "What are the provisions following cessation of employment?",
         query="What must an employee do when their role changes?",
-        k=2,
+        k=1,
 ):
     # configure agent
 
@@ -56,9 +56,8 @@ def main(
         ),
         parsing=ParsingConfig(
             splitter=lr.parsing.parser.Splitter.TOKENS,
-            chunk_size=200,
-            overlap=70,
-            separators=["."],
+            chunk_size=100, # roughly matches LangChain child splitter with 400 chars
+            overlap=25,
             n_neighbor_ids=5,
             n_similar_docs=3,
         )
