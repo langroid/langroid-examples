@@ -21,13 +21,13 @@ python3 -m venv .venv
 . .venv/bin/activate
 
 # install dependencies from pyproject.toml:
-# This install langroid with extras.
+# This installs langroid with extras.
 poetry install 
 # or equivalently:
-# pip install "langroid[hf-embeddings,postgres,mysql]"
+# pip install "langroid[litellm,hf-embeddings,postgres,mysql]"
 
 # or to update an existing installation:
-pip install --upgrade "langroid[hf-embeddings,postgres,mysql]"
+pip install --upgrade "langroid[litellm,hf-embeddings,postgres,mysql]"
 ```
 
 
@@ -43,9 +43,11 @@ In the root of the repo, copy the `.env-template` file to a new file `.env`:
 cp .env-template .env
 ```
 Then insert your OpenAI API Key.
-Your `.env` file should look like this:
+Your `.env` file should look like this (the organization is optional but may be
+required in some scenarios):
 ```bash
 OPENAI_API_KEY=your-key-here-without-quotes
+OPENAI_ORGANIZATION=optionally-your-organization-id
 ````
 
 Alternatively, you can set this as an environment variable in your shell
