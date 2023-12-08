@@ -23,11 +23,7 @@ app = typer.Typer()
 def chat() -> None:
     print("[blue]Welcome to langroid!")
 
-    cfg = lr.language_models.OpenAIGPTConfig(
-        chat_model=lr.language_models.OpenAIChatModel.GPT4,
-    )
-
-    mdl = lr.language_models.OpenAIGPT(cfg)
+    mdl = lr.language_models.OpenAIGPT()
     messages = [
         LLMMessage(role=Role.SYSTEM, content="You are a helpful assitant"),
     ]

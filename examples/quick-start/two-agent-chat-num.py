@@ -23,15 +23,7 @@ lr.utils.logging.setup_colored_logging()
 
 
 def chat() -> None:
-    config = lr.ChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
-            chat_model=lr.language_models.OpenAIChatModel.GPT4,
-        ),
-        vecdb=None,
-    )
-    student_agent = lr.ChatAgent(config)
     student_task = lr.Task(
-        student_agent,
         name = "Student",
         system_message="""
         You will receive a list of numbers from me (the User),
@@ -50,9 +42,8 @@ def chat() -> None:
         llm_delegate=True,
         single_round=False,
     )
-    adder_agent = lr.ChatAgent(config)
+
     adder_task = lr.Task(
-        adder_agent,
         name = "Adder",
         system_message="""
         You are an expert on addition of numbers. 

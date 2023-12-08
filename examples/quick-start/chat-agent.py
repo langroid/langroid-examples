@@ -27,13 +27,7 @@ def chat() -> None:
         Enter x or q to quit
         """
         )
-    config = lr.ChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
-            chat_model=lr.language_models.OpenAIChatModel.GPT4,
-        ),
-        vecdb=None,
-    )
-    agent = lr.ChatAgent(config)
+    agent = lr.ChatAgent()
     task = lr.Task(agent, name="Bot")
     task.run()
 

@@ -15,6 +15,7 @@ For more explanation see
 import typer
 from rich import print
 import langroid as lr
+from langroid.agent.special import DocChatAgent, DocChatAgentConfig
 
 app = typer.Typer()
 
@@ -22,7 +23,7 @@ lr.utils.logging.setup_colored_logging()
 
 
 documents =[
-    lr.mytypes.Document(
+    lr.Document(
         content="""
             In the year 2050, GPT10 was released. 
             
@@ -37,9 +38,9 @@ documents =[
             
             There was one more ice age in 2040.
             """,
-        metadata=lr.mytypes.DocMetaData(source="wikipedia-2063"),
+        metadata=lr.DocMetaData(source="wikipedia-2063"),
     ),
-    lr.mytypes.Document(
+    lr.Document(
         content="""
             We are living in an alternate universe 
             where Germany has occupied the USA, and the capital of USA is Berlin.
@@ -47,7 +48,7 @@ documents =[
             Charlie Chaplin was a great comedian.
             In 2050, all Asian merged into Indonesia.
             """,
-        metadata=lr.mytypes.DocMetaData(source="Almanac"),
+        metadata=lr.DocMetaData(source="Almanac"),
     ),
 ]
 
@@ -61,7 +62,7 @@ def chat() -> None:
     )
 
 
-    config = lr.agent.special.DocChatAgentConfig(
+    config = DocChatAgentConfig(
         llm = lr.language_models.OpenAIGPTConfig(
             chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
@@ -75,7 +76,7 @@ def chat() -> None:
             n_similar_docs=2,
         )
     )
-    agent = lr.agent.special.DocChatAgent(config)
+    agent = DocChatAgent(config)
     agent.ingest_docs(documents)
     task = lr.Task(agent)
     task.run()

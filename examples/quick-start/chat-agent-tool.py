@@ -59,9 +59,6 @@ def chat(opts: CLIOptions) -> None:
     spy_game_agent = SpyGameAgent(
         lr.ChatAgentConfig(
             name="Spy",
-            llm = lr.language_models.OpenAIGPTConfig(
-                chat_model=lr.language_models.OpenAIChatModel.GPT4,
-            ),
             vecdb=None,
             use_tools=not opts.fn_api,
             use_functions_api=opts.fn_api,

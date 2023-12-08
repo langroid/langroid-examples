@@ -25,15 +25,7 @@ lr.utils.logging.setup_colored_logging()
 NO_ANSWER = lr.utils.constants.NO_ANSWER
 
 def chat() -> None:
-    config = lr.ChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
-            chat_model=lr.language_models.OpenAIChatModel.GPT4,
-        ),
-        vecdb=None,
-    )
-    processor_agent = lr.ChatAgent(config)
     processor_task = lr.Task(
-        processor_agent,
         name = "Processor",
         system_message="""
         You will receive a list of numbers from the user.
@@ -50,9 +42,8 @@ def chat() -> None:
         llm_delegate=True,
         single_round=False,
     )
-    even_agent = lr.ChatAgent(config)
+
     even_task = lr.Task(
-        even_agent,
         name = "EvenHandler",
         system_message=f"""
         You will be given a number. 
@@ -62,9 +53,7 @@ def chat() -> None:
         single_round=True,  # task done after 1 step() with valid response
     )
 
-    odd_agent = lr.ChatAgent(config)
     odd_task = lr.Task(
-        odd_agent,
         name = "OddHandler",
         system_message=f"""
         You will be given a number n. 

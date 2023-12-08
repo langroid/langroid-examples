@@ -35,13 +35,11 @@ lr.utils.logging.setup_colored_logging()
 
 def chat(tools:bool=False) -> None:
     config = lr.ChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
-            chat_model=lr.language_models.OpenAIChatModel.GPT4,
-        ),
         use_tools = tools,
         use_functions_api = not tools,
         vecdb = None,
     )
+
     processor_agent = lr.ChatAgent(config)
     processor_agent.enable_message(lr.agent.tools.RecipientTool)
     processor_task = lr.Task(
@@ -70,6 +68,7 @@ def chat(tools:bool=False) -> None:
         llm_delegate=True,
         single_round=False,
     )
+
     even_agent = lr.ChatAgent(config)
     even_task = lr.Task(
         even_agent,
