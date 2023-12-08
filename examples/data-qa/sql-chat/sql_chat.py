@@ -30,14 +30,15 @@ from langroid.agent.special.sql.sql_chat_agent import (
     SQLChatAgentConfig,
 )
 from langroid.agent.task import Task
+from langroid.cachedb.redis_cachedb import RedisCacheConfig
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
-from langroid.utils.configuration import set_global, Settings
+from langroid.utils.configuration import set_global, Settings, settings
 from langroid.utils.logging import setup_colored_logging
 import logging
 
 logger = logging.getLogger(__name__)
 
-
+settings.cache_type = "fakeredis"
 app = typer.Typer()
 
 setup_colored_logging()
@@ -166,6 +167,7 @@ def chat(opts: CLIOptions) -> None:
 
     agent = SQLChatAgent(
         config=SQLChatAgentConfig(
+            show_stats=False,
             database_uri=database_uri,
             use_tools=not opts.fn_api,
             use_functions_api=opts.fn_api,
@@ -173,6 +175,7 @@ def chat(opts: CLIOptions) -> None:
             use_schema_tools=opts.schema_tools,
             llm=OpenAIGPTConfig(
                 chat_model=OpenAIChatModel.GPT4,
+                cache_config=RedisCacheConfig(fake=True),
             ),
         )
     )
