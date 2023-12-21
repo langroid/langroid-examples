@@ -1,3 +1,5 @@
+import time
+
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.utils.logging import setup_colored_logging
 from langroid.vector_store.qdrantdb import QdrantDBConfig
@@ -77,15 +79,20 @@ class BankingTextClassifier:
         self.results_file = "./test_llm_responses.csv"
         self.results = {}
 
-        # TODO: for debug purposes only, must be removed
-        self.test_df = self.test_df[self.test_df['ID'] < 25]
         self.llm_responses = None
+
+    def checkpoint_result(self, llm_responses):
+        result_dict_list = [{'ID': int(key), 'llm_label': value} for key, value in llm_responses.items()]
+        result_df = pd.DataFrame(result_dict_list)
+        result_df.to_csv(self.results_file, index=False)
+        return result_df
 
     def run_tweet_emotion_detect(self):
         agent = ChatAgent(self.chat_agent_config)
 
         llm_responses = {}
         for idx, row in self.test_df.iterrows():
+            print(f"Processing idx: {idx}")
             prompt = self.base_prompt
             nearest_examples = self.banking_text_retriever_agent.get_relevant_chunks(query=row['text'])
             for index in range(len(nearest_examples)):
@@ -96,12 +103,13 @@ class BankingTextClassifier:
                 prompt = prompt + f"Label: {label}\n"
             prompt = prompt + "\n" + f"Text: {row['text']}\n Label: "
             llm_responses[row['ID']] = agent.llm_response_forget(prompt).content
+            if idx % 100 == 0:
+                print(f"Checkpointing llm responses after idx: {idx}")
+                self.checkpoint_result(llm_responses)
+                print(f"Sleeping for a min...")
+                time.sleep(60)
 
-        result_dict_list = [{'ID': int(key), 'llm_label': value} for key, value in llm_responses.items()]
-        result_df = pd.DataFrame(result_dict_list)
-        result_df.to_csv(self.results_file, index=False)
-
-        self.llm_responses = result_df
+        self.llm_responses = self.checkpoint_result(llm_responses)
 
         self.compute_results(self.llm_responses)
 
