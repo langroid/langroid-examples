@@ -81,6 +81,10 @@ class BankingTextClassifier:
 
         self.llm_responses = None
 
+    def load_checkpoint(self):
+        df = pd.read_csv(self.results_file)
+        return dict(zip(df['ID'], df['llm_label']))
+
     def checkpoint_result(self, llm_responses):
         result_dict_list = [{'ID': int(key), 'llm_label': value} for key, value in llm_responses.items()]
         result_df = pd.DataFrame(result_dict_list)
@@ -90,24 +94,25 @@ class BankingTextClassifier:
     def run_tweet_emotion_detect(self):
         agent = ChatAgent(self.chat_agent_config)
 
-        llm_responses = {}
+        llm_responses = self.load_checkpoint()
         for idx, row in self.test_df.iterrows():
-            print(f"Processing idx: {idx}")
-            prompt = self.base_prompt
-            nearest_examples = self.banking_text_retriever_agent.get_relevant_chunks(query=row['text'])
-            for index in range(len(nearest_examples)):
-                example = nearest_examples[index].content
-                text = example.split("text=")[1].split(", label=")[0]
-                label = example.split(", label=")[1]
-                prompt = prompt + f"Text: {text}\n"
-                prompt = prompt + f"Label: {label}\n"
-            prompt = prompt + "\n" + f"Text: {row['text']}\n Label: "
-            llm_responses[row['ID']] = agent.llm_response_forget(prompt).content
-            if idx % 100 == 0:
-                print(f"Checkpointing llm responses after idx: {idx}")
-                self.checkpoint_result(llm_responses)
-                print(f"Sleeping for a min...")
-                time.sleep(60)
+            if row['ID'] not in llm_responses.keys():
+                print(f"Processing idx: {idx}")
+                prompt = self.base_prompt
+                nearest_examples = self.banking_text_retriever_agent.get_relevant_chunks(query=row['text'])
+                for index in range(len(nearest_examples)):
+                    example = nearest_examples[index].content
+                    text = example.split("text=")[1].split(", label=")[0]
+                    label = example.split(", label=")[1]
+                    prompt = prompt + f"Text: {text}\n"
+                    prompt = prompt + f"Label: {label}\n"
+                prompt = prompt + "\n" + f"Text: {row['text']}\n Label: "
+                llm_responses[row['ID']] = agent.llm_response_forget(prompt).content
+                if idx % 25 == 0:
+                    print(f"Checkpointing llm responses after idx: {idx}")
+                    self.checkpoint_result(llm_responses)
+                    print(f"Sleeping for a min...")
+                    time.sleep(60)
 
         self.llm_responses = self.checkpoint_result(llm_responses)
 
