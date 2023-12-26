@@ -18,6 +18,7 @@ from typing import List
 import json
 import os
 
+from langroid.mytypes import Entity
 from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
 from langroid.parsing.parser import ParsingConfig
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
@@ -56,6 +57,8 @@ class Lease(BaseModel):
 
 
 class LeaseMessage(ToolMessage):
+    """Tool/function to use to present details about a commercial lease"""
+
     request: str = "lease_info"
     purpose: str = """
         Collect information about a Commercial Lease.
@@ -96,7 +99,7 @@ class LeaseExtractorAgent(ChatAgent):
         {message.terms}
         """
         )
-        return json.dumps(message.terms.dict())
+        return "DONE " + json.dumps(message.terms.dict())
 
 
 class CLIOptions(BaseSettings):
@@ -125,8 +128,8 @@ def chat(opts: CLIOptions) -> None:
     doc_task = Task(
         doc_agent,
         name="DocAgent",
-        llm_delegate=False,
-        single_round=True,
+        done_if_no_response=[Entity.LLM],  # done if null response from LLM
+        done_if_response=[Entity.LLM],  # done if non-null response from LLM
         system_message="""You are an expert on Commercial Leases. 
         You will receive various questions about a Commercial 
         Lease contract, and your job is to answer them concisely in at most 2 sentences.
@@ -141,24 +144,18 @@ def chat(opts: CLIOptions) -> None:
             vecdb=None,
         )
     )
-    lease_extractor_agent.enable_message(
-        LeaseMessage,
-        use=True,
-        handle=True,
-        force=False,
-    )
+    lease_extractor_agent.enable_message(LeaseMessage)
+
     lease_task = Task(
         lease_extractor_agent,
         name="LeaseExtractorAgent",
-        llm_delegate=True,
-        single_round=False,
+        interactive=False,  # set to True to slow it down (hit enter to progress)
         system_message=f"""
         You have to collect some information about a Commercial Lease, but you do not 
         have access to the lease itself. 
         You can ask me questions about the lease, ONE AT A TIME, I will answer each 
         question. You only need to collect info corresponding to the fields in this 
-        example:
-        {LeaseMessage.usage_example()}
+        specified structure. 
         If I am unable to answer your question initially, try asking me 
         differently. If I am still unable to answer after 3 tries, fill in 
         {NO_ANSWER} for that field.

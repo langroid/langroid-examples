@@ -26,8 +26,7 @@ Main
         - Adder
 
 For a full write-up on the design considerations, see the documentation page on
-[Hiearchical Agent Computations](https://github.com/langroid/langroid/blob/main/docs
-/examples/agent-tree.md)
+Hiearchical Agent Computations at https://langroid.github.io/langroid/examples/agent-tree/
 """
 
 import typer
@@ -40,7 +39,7 @@ from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from langroid.utils.globals import GlobalState
 from langroid.utils.configuration import set_global, Settings
 from langroid.utils.logging import setup_colored_logging
-from langroid.utils.constants import NO_ANSWER
+from langroid.utils.constants import DONE
 
 app = typer.Typer()
 
@@ -93,8 +92,7 @@ def chat() -> None:
     main_task = Task(
         main_agent,
         name="Main",
-        default_human_response="",
-        only_user_quits_root=False,
+        interactive=False,
         system_message="""
         You will receive two types of messages, to which you will respond as follows:
         
@@ -108,8 +106,6 @@ def chat() -> None:
         To start off, ask the user for the initial number, 
         using the `ask_num` tool/function.
         """,
-        llm_delegate=True,
-        single_round=False,
     )
 
     # Handles only even numbers
@@ -122,15 +118,13 @@ def chat() -> None:
         You will receive two types of messages, to which you will respond as follows:
         
         INPUT Message format: <number>
-        - if the <number> is odd, say "{NO_ANSWER}"
+        - if the <number> is odd, say '{DONE}'
         - otherwise, simply write the <number>, say nothing else.
         
         RESULT Message format: RESULT <number>
         In this case simply write "DONE RESULT <number>", e.g.:
         DONE RESULT 19
         """,
-        llm_delegate=True,
-        single_round=False,
     )
 
     # handles only even numbers ending in Zero
@@ -144,14 +138,12 @@ def chat() -> None:
         
         INPUT Message format: <number>
         - if <number> n is even AND divisible by 10, compute n/10 and pass it on,
-        - otherwise, say "{NO_ANSWER}"
+        - otherwise, say '{DONE}'
         
         RESULT Message format: RESULT <number>
         In this case simply write "DONE RESULT <number>", e.g.:
         DONE RESULT 19
         """,
-        llm_delegate=True,
-        single_round=False,
     )
 
     # Handles only even numbers NOT ending in Zero
@@ -165,14 +157,12 @@ def chat() -> None:
         
         INPUT Message format: <number>
         - if <number> n is even AND NOT divisible by 10, compute n/2 and pass it on,
-        - otherwise, say "{NO_ANSWER}"
+        - otherwise, say '{DONE}'
         
         RESULT Message format: RESULT <number>
         In this case simply write "DONE RESULT <number>", e.g.:
         DONE RESULT 19
         """,
-        llm_delegate=True,
-        single_round=False,
     )
 
     # Handles only odd numbers
@@ -186,14 +176,12 @@ def chat() -> None:
         
         INPUT Message format: <number>
         - if <number> n is odd, compute n*3+1 and write it.
-        - otherwise, say "{NO_ANSWER}"
+        - otherwise, say '{DONE}'
 
         RESULT Message format: RESULT <number>        
         In this case simply write "DONE RESULT <number>", e.g.:
         DONE RESULT 19
         """,
-        llm_delegate=True,
-        single_round=False,
     )
 
     adder_agent = ChatAgent(config)
@@ -209,8 +197,6 @@ def chat() -> None:
         When you receive the result, say "DONE RESULT <result>", e.g.
         DONE RESULT 19
         """,
-        llm_delegate=False,
-        single_round=False,
     )
 
     # set up tasks and subtasks
