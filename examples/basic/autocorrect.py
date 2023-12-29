@@ -2,11 +2,17 @@
 A two agent chat system where
 - AutoCorrect agent corrects the user's possibly mistyped input,
 - Chatter agent responds to the corrected user's input.
+
+Run it like this:
+
+python3 examples/basic/autocorrect.py
+
 """
 
 import typer
 from rich import print
 
+import langroid as lr
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
@@ -56,11 +62,9 @@ def chat() -> None:
         one. Once the user selects a suggestion, simply write out that version.
         Remember to ONLY suggest sensible interpretations. For example
         "Which month is the tallest in the world" is meaningless, so you should not
-        ever such a suggestion in your list.
+        ever include such a suggestion in your list.
         Start by asking me to writing something.
         """,
-        llm_delegate=True,
-        single_round=False,
     )
 
     chat_agent = ChatAgent(config)
@@ -68,9 +72,8 @@ def chat() -> None:
         chat_agent,
         name="Chat",
         system_message="Answer or respond very concisely, no more than 1-2 sentences!",
-        llm_delegate=False,
-        single_round=True,
-
+        done_if_no_response=[lr.Entity.LLM],
+        done_if_response=[lr.Entity.LLM],
     )
     autocorrect_task.add_sub_task(chat_task)
     autocorrect_task.run()

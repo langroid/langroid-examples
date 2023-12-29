@@ -22,11 +22,16 @@ localhost:8000:
 
 python3 examples/docqa/doc-chat-multi-llm.py -m local/localhost:8000
 
+See here for a guide on how to use Langroid with non-OpenAI LLMs (local/remote):
+https://langroid.github.io/langroid/tutorials/non-openai-llms/
+
 """
 import typer
 from rich import print
 import os
 
+import langroid as lr
+import langroid.language_models.base
 from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
     DocChatAgentConfig,
@@ -55,8 +60,8 @@ def chat(config: DocChatAgentConfig) -> None:
     doc_task = Task(
         doc_agent,
         name="DocAgent",
-        llm_delegate=False,
-        single_round=True,
+        done_if_no_response=[lr.Entity.LLM],
+        done_if_response=[lr.Entity.LLM],
     )
 
     writer_agent = ChatAgent(
@@ -70,8 +75,6 @@ def chat(config: DocChatAgentConfig) -> None:
     writer_task = Task(
         writer_agent,
         name="WriterAgent",
-        llm_delegate=True,
-        single_round=False,
         system_message=f"""
         You are tenacious, creative and resourceful when given a question to 
         find an answer for. You will receive questions from a user, which you will 
@@ -108,6 +111,10 @@ def chat(config: DocChatAgentConfig) -> None:
     )
     writer_task.add_sub_task(doc_task)
     writer_task.run()
+
+    # show cost summary
+    print("LLM usage, cost summary:")
+    print(str(langroid.language_models.base.LanguageModel.usage_cost_summary()))
 
 
 @app.command()
