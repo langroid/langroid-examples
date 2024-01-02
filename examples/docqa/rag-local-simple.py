@@ -6,7 +6,7 @@ RAG example using a local LLM, with ollama
 
 # (2) Ensure you've installed the `litellm` extra with Langroid, e.g.
 # pip install langroid[litellm], or if you use the `pyproject.toml` in this repo
-# you can simply say `poetry install`
+# you can simply use `poetry install`
 
 # (3) Run like this:
 
@@ -20,6 +20,12 @@ from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConf
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+# Create the llm config object.
+# Note: if instead of ollama you've spun up your local LLM to listen at
+# an OpenAI-Compatible Endpoint like `localhost:8000`, then you can set
+# chat_model="local/localhost:8000"; carefully note there's no http in this,
+# and if the endpoint is localhost:8000/v1, then you must set
+# chat_model="local/localhost:8000/v1"
 llm = lm.OpenAIGPTConfig(
     chat_model="litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M",
     chat_context_length=4096, # set this based on model
@@ -29,7 +35,8 @@ llm = lm.OpenAIGPTConfig(
     timeout=45,
 )
 
-# test if basic chat works with this llm setup
+# Recommended: First test if basic chat works with this llm setup as below:
+# Once this works, then you can try the DocChatAgent
 #
 # agent = lr.ChatAgent(
 #     lr.ChatAgentConfig(
