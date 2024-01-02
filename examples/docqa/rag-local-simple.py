@@ -1,12 +1,5 @@
 """
 RAG example using a local LLM, with ollama
-"""
-import os
-import langroid as lr
-import langroid.language_models as lm
-from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # (1) Mac: Install latest ollama, then do this:
 # ollama pull mistral:7b-instruct-v0.2-q4_K_M
@@ -14,6 +7,18 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # (2) Ensure you've installed the `litellm` extra with Langroid, e.g.
 # pip install langroid[litellm], or if you use the `pyproject.toml` in this repo
 # you can simply say `poetry install`
+
+# (3) Run like this:
+
+python3 examples/docqa/rag-local-simple.py
+
+"""
+import os
+import langroid as lr
+import langroid.language_models as lm
+from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 llm = lm.OpenAIGPTConfig(
     chat_model="litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M",
