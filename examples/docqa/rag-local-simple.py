@@ -1,5 +1,7 @@
+"""
+RAG example using a local LLM, with ollama
+"""
 import os
-import sys
 import langroid as lr
 import langroid.language_models as lm
 from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
@@ -34,6 +36,7 @@ llm = lm.OpenAIGPTConfig(
 # agent.llm_response("What is 3 + 4?")
 #
 # task = lr.Task(agent)
+# verify you can interact with this in a chat loop on cmd line:
 # task.run("Concisely answer some questions")
 
 hf_embed_config = lr.embedding_models.SentenceTransformerEmbeddingsConfig(
