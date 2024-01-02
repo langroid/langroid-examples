@@ -22,7 +22,6 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 llm = lm.OpenAIGPTConfig(
     chat_model="litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M",
-    completion_model="litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M",
     chat_context_length=4096, # set this based on model
     max_output_tokens=100,
     temperature=0.2,
@@ -51,9 +50,14 @@ hf_embed_config = lr.embedding_models.SentenceTransformerEmbeddingsConfig(
 
 config = DocChatAgentConfig(
     default_paths= [],
+    show_stats=False, # no token cost stats
+    use_tools=True, # use langroid-native tools
+    use_functions_api=False, # don't use open-ai fn-calling
     conversation_mode=True,
     llm = llm,
     relevance_extractor_config = lr.agent.special.RelevanceExtractorAgentConfig(
+        use_tools=True,
+        use_functions_api=False,
         llm=llm
     ),
     vecdb=lr.vector_store.QdrantDBConfig(
