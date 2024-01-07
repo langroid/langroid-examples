@@ -23,9 +23,9 @@ import langroid.language_models as lm
 #   or you can explicitly specify it as `lm.OpenAIChatModel.GPT4` or `lm.OpenAIChatModel.GPT4_TURBO`
 
 llm_config = lm.OpenAIGPTConfig(
-    chat_model="local/api-inference.huggingface.co/models/TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-    max_output_tokens=20,
-    chat_context_length=500,  # adjust based on your local LLM params
+    chat_model="litellm/ollama/mistral",
+    max_output_tokens=200,
+    chat_context_length=2048,  # adjust based on your local LLM params
 )
 
 # Alternatively, if you've used ooba or other lib to spin up a Local LLM
@@ -39,6 +39,7 @@ llm_config = lm.OpenAIGPTConfig(
 
 agent_config = lr.ChatAgentConfig(
     llm=llm_config,
+    system_message="""Be helpful but very very concise""",
 )
 
 agent = lr.ChatAgent(agent_config)

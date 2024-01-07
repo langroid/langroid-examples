@@ -26,6 +26,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # chat_model="local/localhost:8000"; carefully note there's no http in this,
 # and if the endpoint is localhost:8000/v1, then you must set
 # chat_model="local/localhost:8000/v1"
+# Similarly if your endpoint is `http://128.0.4.5:8000/v1`, then you must set
+# chat_model="local/128.0.4.5:8000/v1"
 llm = lm.OpenAIGPTConfig(
     chat_model="litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M",
     chat_context_length=4096, # set this based on model
@@ -73,6 +75,8 @@ config = DocChatAgentConfig(
         embedding=hf_embed_config
     ),
     doc_paths= [
+        # can be URLS, file-paths, or Folders.
+        # File-types: most web-pages, and local pdf, txt, docx
         "https://arxiv.org/pdf/2312.17238.pdf",
     ],
     system_message="""
