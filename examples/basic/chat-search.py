@@ -35,7 +35,6 @@ from rich.prompt import Prompt
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.task import Task
-from langroid.agent.tool_message import ToolMessage
 from langroid.agent.tools.google_search_tool import GoogleSearchTool
 from langroid.agent.tools.sciphi_search_rag_tool import SciPhiSearchRAGTool
 from langroid.language_models.openai_gpt import OpenAIGPTConfig

@@ -53,6 +53,7 @@ async def on_chat_start():
     sys_msg = "You are a helpful assistant. Be concise in your answers."
     config = ChatAgentConfig(
         system_message=sys_msg,
+        show_stats=False,
     )
     agent = ChatAgent(config)
     cl.user_session.set("agent", agent)
