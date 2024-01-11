@@ -1,7 +1,5 @@
 import os
 
-os.environ['OPENAI_API_KEY'] = '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'
-
 from langroid.agent.chat_agent import ChatAgentConfig
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from banking_classification import BankingTextClassifier
