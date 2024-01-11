@@ -99,6 +99,7 @@ class BankingTextClassifier:
             if row['ID'] not in llm_responses.keys():
                 print(f"Processing idx: {idx}")
                 prompt = self.base_prompt
+                # todo: Use vec db directly instead of doc chat agent
                 nearest_examples = self.banking_text_retriever_agent.get_relevant_chunks(query=row['text'])
                 for index in range(len(nearest_examples)):
                     example = nearest_examples[index].content
@@ -108,11 +109,13 @@ class BankingTextClassifier:
                     prompt = prompt + f"Label: {label}\n"
                 prompt = prompt + "\n" + f"Text: {row['text']}\n Label: "
                 llm_responses[row['ID']] = agent.llm_response_forget(prompt).content
-                if idx % 25 == 0:
+                if idx % 33 == 0:
                     print(f"Checkpointing llm responses after idx: {idx}")
                     self.checkpoint_result(llm_responses)
-                    print(f"Sleeping for a min...")
-                    time.sleep(60)
+                    # BUG: reinitialize agent. After 100 requests the process starts timeing out infinitely...
+                    agent = ChatAgent(self.chat_agent_config)
+                    # print(f"Sleeping for a min...")
+                    # time.sleep(60)
 
         self.llm_responses = self.checkpoint_result(llm_responses)
 
