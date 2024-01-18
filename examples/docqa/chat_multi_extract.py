@@ -9,11 +9,17 @@ Repeat: WriterAgent --Question--> DocAgent --> Answer
 Example:
 python3 examples/docqa/chat_multi_extract.py
 
-Use -f option to use OpenAI function calling API instead of Langroid tool.
+This uses a GPT4 model by default but you can provide an local LLM via the -m arg.
+This scripts works very well with the `dolphin-mixtral` local LLM:
+```
+ollama run dolphin-mixtral
+python3 examples/docqa/chat_multi_extract.py -m litellm/ollama_chat/dolphin-mixtral:latest
+```
+
 """
 import typer
 from rich import print
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel
 from typing import List
 import json
 import os
@@ -27,12 +33,10 @@ from langroid.agent.task import Task
 from langroid.agent.tool_message import ToolMessage
 from langroid.language_models.openai_gpt import OpenAIGPTConfig
 from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
 from langroid.utils.constants import NO_ANSWER
 
 app = typer.Typer()
 
-setup_colored_logging()
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
@@ -117,14 +121,15 @@ def main(
     )
     llm_cfg = OpenAIGPTConfig(
         chat_model=model or lm.OpenAIChatModel.GPT4_TURBO,
+        chat_context_length=16_000,  # adjust based on model
     )
     doc_agent = DocChatAgent(
         DocChatAgentConfig(
             llm=llm_cfg,
             parsing=ParsingConfig(
-                chunk_size=100,
-                overlap=20,
-                n_similar_docs=4,
+                chunk_size=300,
+                overlap=50,
+                n_similar_docs=3,
             ),
             cross_encoder_reranking_model="",
         )
@@ -178,6 +183,7 @@ def main(
     )
     lease_task.add_sub_task(doc_task)
     lease_task.run()
+
 
 if __name__ == "__main__":
     app()

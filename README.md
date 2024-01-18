@@ -30,10 +30,15 @@ poetry install
 pip install --upgrade "langroid[litellm,hf-embeddings,postgres,mysql]"
 ```
 
+Once you have the environment setup, you can either:
+- work with a local LLM (see instructions [here](https://langroid.github.io/langroid/tutorials/local-llm-setup/).
+  Some of the example scripts have been explicitly tested with various local LLMs,
+  and will often have the word `local` in the script name.
+- or use an OpenAI LLM (see instructions below).
 
 ## Set up environment variables (API keys, etc)
 
-To get started, all you need is an OpenAI API Key.
+To use the example scripts with an OpenAI LLM, you need an OpenAI API Key.
 If you don't have one, see [this OpenAI Page](https://help.openai.com/en/collections/3675940-getting-started-with-openai-api).
 Currently only OpenAI models are supported. Others will be added later
 (Pull Requests welcome!).
