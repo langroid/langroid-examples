@@ -23,7 +23,7 @@ import langroid.language_models as lm
 #   or you can explicitly specify it as `lm.OpenAIChatModel.GPT4` or `lm.OpenAIChatModel.GPT4_TURBO`
 
 llm_config = lm.OpenAIGPTConfig(
-    chat_model="litellm/ollama/mistral",
+    chat_model="litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M",
     max_output_tokens=200,
     chat_context_length=2048,  # adjust based on your local LLM params
 )
