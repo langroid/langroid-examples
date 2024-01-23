@@ -14,7 +14,7 @@ mysql dev
 ```
 sudo apt install libmysqlclient-dev
 ```
-and if you are on an earlier version of ubuntu, then python11
+and if you are on an earlier version of ubuntu, then python11 (or later)
 ```
 sudo apt install python3.11-dev build-essential
 ```
