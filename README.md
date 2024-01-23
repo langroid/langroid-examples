@@ -3,6 +3,21 @@
 Examples of using the [Langroid](https://github.com/langroid/langroid) 
 Multi-Agent Programming framework to build LLM applications.
 
+## Ubuntu
+On ubuntu you'll need to make sure a few dependencies are installed including
+
+postgrestql
+```
+sudo apt-get install libpq-dev
+```
+mysql dev
+```
+sudo apt install libmysqlclient-dev
+```
+and if you are on an earlier version of ubuntu, then python11
+```
+sudo apt install python3.11-dev build-essential
+```
 ## Set up virtual env and install `langroid`
 
 IMPORTANT: Please ensure you are using Python 3.11+. If you are using poetry,
