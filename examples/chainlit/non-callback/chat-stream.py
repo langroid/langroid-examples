@@ -1,5 +1,14 @@
 """
-Basic single-agent chat example, with streaming.
+DEPRECATED, not guaranteed to work: We are keeping this example for reference,
+but do not use this as way to chat with streaming.
+See chat-callback.py for the best way to do this
+(i.e. use ChainlitAgentCallbacks when interacting directly an Agent,
+or use ChainlitTaskCallbacks when interacting with a Task).
+
+Basic single-agent chat example, with streaming,
+using an older method, rather than the best way,
+which is via callbacks, as in chat-callback.py.
+
 
 After setting up the virtual env as in README,
 and you have your OpenAI API Key in the .env file, run like this:
@@ -14,7 +23,8 @@ import re
 import sys
 import asyncio
 
-settings.stream = True # works if False as well
+settings.stream = True  # works if False as well
+
 
 class ContinuousCaptureStream:
     """
@@ -22,6 +32,7 @@ class ContinuousCaptureStream:
     This allows capturing of streaming output that would normally be printed to stdout,
     e.g. streaming tokens coming from OpenAI's API.
     """
+
     def __init__(self):
         self.content = ""
         self.new_content_event = asyncio.Event()
@@ -44,9 +55,13 @@ class ContinuousCaptureStream:
         self.is_finished = True
         self.new_content_event.set()  # T
 
+
 def strip_ansi_codes(text):
-    ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9A\x9C-\x9F]|[\x1A-\x1C\x1E-\x1F])+\[[0-?]*[ -/]*[@-~]')
-    return ansi_escape.sub('', text)
+    ansi_escape = re.compile(
+        r"(?:\x1B[@-_]|[\x80-\x9A\x9C-\x9F]|[\x1A-\x1C\x1E-\x1F])+\[[0-?]*[ -/]*[@-~]"
+    )
+    return ansi_escape.sub("", text)
+
 
 @cl.on_chat_start
 async def on_chat_start():
