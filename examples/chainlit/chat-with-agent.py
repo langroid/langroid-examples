@@ -17,11 +17,11 @@ from langroid.agent.callbacks.chainlit import add_instructions
 @cl.on_chat_start
 async def on_chat_start():
     config = lr.ChatAgentConfig(
-        name="Assistant",
+        name="Demo",
         system_message="You are a helpful assistant. Be concise in your answers.",
     )
     agent = lr.ChatAgent(config)
-    lr.ChainlitAgentCallbacks(agent)
+
     cl.user_session.set("agent", agent)
 
     await add_instructions(
@@ -33,4 +33,6 @@ async def on_chat_start():
 @cl.on_message
 async def on_message(message: cl.Message):
     agent: lr.ChatAgent = cl.user_session.get("agent")
+    # important: only apply callbacks after getting first msg.
+    lr.ChainlitAgentCallbacks(agent, message)
     await agent.llm_response_async(message.content)

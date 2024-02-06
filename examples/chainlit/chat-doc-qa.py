@@ -31,7 +31,7 @@ from langroid.agent.callbacks.chainlit import (
     add_instructions,
     make_llm_settings_widgets,
     setup_llm,
-    update_agent,
+    update_llm,
 )
 from textwrap import dedent
 
@@ -75,13 +75,13 @@ async def setup_agent() -> None:
     msg.content = f"Processing `{file.name}` done. Ask questions!"
     await msg.update()
 
-    lr.ChainlitAgentCallbacks(agent)
     cl.user_session.set("agent", agent)
 
 
 @cl.on_settings_update
 async def on_update(settings):
-    await update_agent(settings)
+    await update_llm(settings)
+    await setup_agent()
 
 
 @cl.on_chat_start
@@ -124,6 +124,7 @@ async def on_chat_start():
 @cl.on_message
 async def on_message(message: cl.Message):
     agent: lr.ChatAgent = cl.user_session.get("agent")
+    lr.ChainlitAgentCallbacks(agent, message)
     response: lr.ChatDocument | None = await cl.make_async(agent.llm_response)(
         message.content
     )
