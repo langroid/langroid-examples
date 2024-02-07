@@ -1,5 +1,6 @@
 # Welcome to Langroid 👋
 
+![Langroid](public/langroid-card.png)
 
 ---
 When it is your turn to enter a message, you can do one of two things:
