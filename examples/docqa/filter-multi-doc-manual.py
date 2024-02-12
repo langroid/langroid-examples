@@ -29,7 +29,6 @@ from pydantic import Field
 import langroid as lr
 import langroid.language_models as lm
 from langroid.agent.special.doc_chat_agent import DocChatAgentConfig
-from langroid.agent.special.lance_rag.lance_rag_task import LanceRAGTaskCreator
 from langroid.agent.special.lance_doc_chat_agent import LanceDocChatAgent
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
 from langroid.vector_store.lancedb import LanceDBConfig
@@ -64,7 +63,7 @@ def main(
         chat_model=model or lm.OpenAIChatModel.GPT4_TURBO,
         # or, other possibilities for example:
         # "litellm/bedrock/anthropic.claude-instant-v1"
-        # "litellm/ollama/llama2"
+        # "ollama/llama2"
         # "local/localhost:8000/v1"
         # "local/localhost:8000"
         chat_context_length=4096,  # adjust based on model

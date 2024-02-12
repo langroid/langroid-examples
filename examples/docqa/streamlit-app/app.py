@@ -1,7 +1,6 @@
 from langroid.utils.configuration import settings
 from utils import configure, agent
 import langroid.language_models as lm
-import tempfile
 
 import streamlit as st
 import os
@@ -19,7 +18,7 @@ if st.session_state.get("chat_model") is None:
 default_chat_model = lm.OpenAIChatModel.GPT4_TURBO.value
 chat_model = st.sidebar.text_input(
     f"""
-Chat model, e.g. `litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M`,
+Chat model, e.g. `ollama/mistral:7b-instruct-v0.2-q4_K_M`,
 or leave empty to default to {default_chat_model}
 """
 )

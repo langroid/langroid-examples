@@ -19,7 +19,6 @@ from rich import print
 from rich.prompt import Prompt
 import os
 
-import langroid as lr
 import langroid.language_models as lm
 from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
@@ -44,16 +43,11 @@ def main(
         chat_model=model or lm.OpenAIChatModel.GPT4_TURBO,
         # or, other possibilities for example:
         # "litellm/bedrock/anthropic.claude-instant-v1"
-        # "litellm/ollama/llama2"
+        # "ollama/llama2"
         # "local/localhost:8000/v1"
         # "local/localhost:8000"
         chat_context_length=4096,  # adjust based on model
         timeout=90,
-    )
-
-    relevance_extractor_config = lr.agent.special.RelevanceExtractorAgentConfig(
-        llm=llm_config,  # or this could be a different llm_config
-        # system_message="...override default RelevanceExtractorAgent system msg here",
     )
 
     config = DocChatAgentConfig(
@@ -63,7 +57,6 @@ def main(
         # set it to > 0 to retrieve a window of k chunks on either side of a match
         n_neighbor_chunks=0,
         llm=llm_config,
-        relevance_extractor_config=relevance_extractor_config,  # or None to turn off
         # system_message="...override default DocChatAgent system msg here",
         # user_message="...override default DocChatAgent user msg here",
         # summarize_prompt="...override default DocChatAgent summarize prompt here",

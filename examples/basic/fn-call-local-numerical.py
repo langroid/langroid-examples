@@ -1,7 +1,7 @@
 """
 Function-calling example using a local LLM, with ollama.
 
-"Function-calling" refers to the ability to ability of the LLM to generate
+"Function-calling" refers to the ability of the LLM to generate
 a structured response, typically a JSON object, instead of a plain text response,
 which is then interpreted by your code to perform some action.
 This is also referred to in various scenarios as "Tools", "Actions" or "Plugins".
@@ -31,7 +31,7 @@ python3 examples/basic/fn-call-local-numerical.py -m <local_model_name>
 Local model with best results is dolphin-mixtral:
 ```
 ollama run dolphin-mixtral
-python3 examples/basic/fn-call-local-numerical.py -m litellm/ollama_chat/dolphin-mixtral:latest
+python3 examples/basic/fn-call-local-numerical.py -m ollama/dolphin-mixtral:latest
 ```
 
 See here for how to set up a Local LLM to work with Langroid:
@@ -43,6 +43,7 @@ from typing import List
 import fire
 
 import langroid as lr
+from langroid.language_models.openai_gpt import OpenAICallParams
 from langroid.utils.configuration import settings
 from langroid.agent.tool_message import ToolMessage
 import langroid.language_models as lm
@@ -57,23 +58,16 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 class PolinskyTool(lr.agent.ToolMessage):
-    """A fictitious number transformation tool. We intentially use
+    """A fictitious number transformation tool. We intentionally use
     a fictitious tool rather than something like "square" or "double"
     to prevent the LLM from trying to answer the question directly.
     """
 
     request: str = "polinsky"
-    purpose: str = "To respond to user request for the Polinsky transform of a <number>."
+    purpose: str = (
+        "To respond to user request for the Polinsky transform of a <number>."
+    )
     number: int
-
-    def handle(self) -> str:
-        """Handle LLM's structured output if it matches Polinsky tool"""
-        result = self.number * 3 + 1
-        msg = f"""
-        SUCCESS! The Polinksy transform of {self.number} is {result}.
-        Present this result to me, and ask for another number.
-        """
-        return msg
 
     @classmethod
     def json_instructions(cls) -> str:
@@ -83,20 +77,6 @@ class PolinskyTool(lr.agent.ToolMessage):
         
         ONLY USE THIS TOOL AFTER THE USER ASKS FOR A POLINSKY TRANSFORM.
         """
-
-    @staticmethod
-    def handle_message_fallback(
-        agent: lr.ChatAgent, msg: str | ChatDocument
-    ) -> str | ChatDocument | None:
-        """Fallback method when LLM forgets to generate a tool"""
-        if isinstance(msg, ChatDocument) and msg.metadata.sender == "LLM":
-            return """
-                You must use the "polinsky" tool/function to 
-                request the Polinsky transform of a number.
-                You either forgot to use it, or you used it with the wrong format.
-                Make sure all fields are filled out and pay attention to the 
-                required types of the fields.
-                """
 
     @classmethod
     def examples(cls) -> List["ToolMessage"]:
@@ -111,6 +91,38 @@ class PolinskyTool(lr.agent.ToolMessage):
         ]
 
 
+class MyChatAgent(lr.ChatAgent):
+    tool_called: bool = False
+
+    def polinsky(self, msg: PolinskyTool) -> str:
+        """Handle LLM's structured output if it matches Polinsky tool"""
+        self.tool_called = True
+        result = msg.number * 3 + 1
+        response = f"""
+        SUCCESS! The Polinksy transform of {msg.number} is {result}.
+        Present this result to me, and ask for another number.
+        """
+        return response
+
+    def handle_message_fallback(
+        self, msg: str | ChatDocument
+    ) -> str | ChatDocument | None:
+        """Fallback method when LLM does not generate a tool,
+        and agent ends up handling the msg"""
+        if isinstance(msg, ChatDocument) and msg.metadata.sender == "LLM":
+            if self.tool_called:
+                self.tool_called = False
+                return "Ask the user what they need help with"
+            else:
+                return """
+                    You must use the "polinsky" tool/function to 
+                    request the Polinsky transform of a number.
+                    You either forgot to use it, or you used it with the wrong format.
+                    Make sure all fields are filled out and pay attention to the 
+                    required types of the fields.
+                    """
+
+
 def app(
     m: str = DEFAULT_LLM,  # model name
     d: bool = False,  # debug
@@ -123,9 +135,13 @@ def app(
         chat_model=m or DEFAULT_LLM,
         chat_context_length=16_000,  # for dolphin-mixtral
         max_output_tokens=100,
+        params=OpenAICallParams(
+            presence_penalty=0.8,
+            frequency_penalty=0.8,
+        ),
         temperature=0,
         stream=True,
-        timeout=45,
+        timeout=100,
     )
 
     # Recommended: First test if basic chat works with this llm setup as below:
@@ -142,7 +158,6 @@ def app(
     # task = lr.Task(agent)
     # verify you can interact with this in a chat loop on cmd line:
     # task.run("Concisely answer some questions")
-
 
     # Define a ChatAgentConfig and ChatAgent
     config = lr.ChatAgentConfig(
@@ -182,7 +197,7 @@ def app(
         """,
     )
 
-    agent = lr.ChatAgent(config)
+    agent = MyChatAgent(config)
 
     # (4) Enable the Tool for this agent --> this auto-inserts JSON instructions
     # and few-shot examples into the system message
@@ -190,7 +205,7 @@ def app(
 
     # (5) Create task and run it to start an interactive loop
     task = lr.Task(agent)
-    task.run("ONLY say this: 'What can I help with?' say NOTHING ELSE.")
+    task.run("Can you help me with some questions?")
 
 
 if __name__ == "__main__":
