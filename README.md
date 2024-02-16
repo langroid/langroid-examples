@@ -32,9 +32,9 @@ pip install --upgrade "langroid[litellm,hf-embeddings,postgres,mysql]"
 
 Once you have the environment setup, you can either:
 - work with a local LLM (see instructions [here](https://langroid.github.io/langroid/tutorials/local-llm-setup/).
-  Some of the example scripts have been explicitly tested with various local LLMs,
-  and will often have the word `local` in the script name.
+  Some of the example scripts have been explicitly tested with various local LLMs.
 - or use an OpenAI LLM (see instructions below).
+
 
 ## Set up environment variables (API keys, etc)
 
@@ -120,15 +120,30 @@ python3 examples/quick-start/chat-agent.py
 ```
 Most of the scripts take additional flags:
 
+- `-m` to specify an LLM, e.g. `-m ollama/mistral`.
 - `-nc` turn off cache retrieval for LLM responses, 
     i.e., get fresh (rather than cached) responses each time you run it.
 - `-d` turns on debug mode, showing more detail such as prompts etc.
-- `-ns` turn off streaming output from the OpenAI API
-- `-f` use OpenAI function-calling instead of Langroid Tool mechanism (where applicable).
 
 All of the examples are best run on the command-line, preferably in a nice
 terminal like [Iterm2](https://iterm2.com/).
 
+
+## Ubuntu
+On ubuntu, for the SQL applications, you'll need to make sure a few dependencies are installed including:
+
+- postgresql
+```
+sudo apt-get install libpq-dev
+```
+- mysql dev
+```
+sudo apt install libmysqlclient-dev
+```
+- and if you are on an earlier version of ubuntu, then python11
+```
+sudo apt install python3.11-dev build-essential
+```
 
 ## Docker Instructions
 
