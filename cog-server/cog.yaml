@@ -1,0 +1,27 @@
+# Configuration for Cog ⚙️
+# Reference: https://github.com/replicate/cog/blob/main/docs/yaml.md
+
+build:
+  # set to true if your model requires a GPU
+  gpu: false
+
+  # a list of ubuntu apt packages to install
+  # system_packages:
+  #   - "libgl1-mesa-glx"
+  #   - "libglib2.0-0"
+
+  # python version in the form '3.11' or '3.11.4'
+  python_version: "3.11"
+
+  # a list of packages in the format <package-name>==<version>
+  #python_packages:
+  #- "langroid==0.1.199"
+
+  # commands run after the environment is setup
+  run:
+    - command: pip install --no-cache-dir langroid
+    - command: echo "new env is ready!!"
+
+# predict.py defines how predictions are run on your model
+predict: "server.py:Extractor"
+#predict: "predict.py:Predictor"
