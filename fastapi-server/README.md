@@ -98,7 +98,7 @@ gcloud run services update langroid-server \
 ## Test GCP endpoints
 
 Same curl cmds as above, but use the endpoint url from the GCP Cloud Run service, 
-e.g.
+e.g. (Note: You must *not* provide a port number in the url!).
 ```bash
 https://langroid-server-xxxxx-uc.a.run.app/process_text
 https://langroid-server-xxxxx-uc.a.run.app/process_file

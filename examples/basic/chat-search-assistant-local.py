@@ -2,11 +2,12 @@
 Version of chat-search-assistant.py that uses local LLMs.
 Tested and works ok nous-hermes2-mixtral, but still has issues.
 
-2-Agent system where:
+3-Agent system where:
 - Assistant takes user's (complex) question, breaks it down into smaller pieces
     if needed
 - Searcher takes Assistant's question, uses the Search tool to search the web
     (using DuckDuckGo), and returns a coherent answer to the Assistant.
+- Critic takes Assistant's final answer, and provides feedback on it.
 
 Once the Assistant thinks it has enough info to answer the user's question, it
 says DONE and presents the answer to the user.
@@ -51,7 +52,7 @@ class QuestionTool(lr.ToolMessage):
     question: str
 
     @classmethod
-    def examples(cls) -> List["lr.ToolMessage"]:
+    def examples(cls) -> List[lr.ToolMessage]:
         return [
             cls(question="Which superconductor material was discovered in 2023?"),
             cls(question="What AI innovation did Meta achieve in 2024?"),
@@ -329,7 +330,7 @@ def main(
 
     assistant_config = lr.ChatAgentConfig(
         system_message="""
-        You are a resourceful assistant, able to think step by step to answer complex
+        You are a resourceful assistant, able to think step by step to answer
         complex questions from the user. You must break down complex questions into
         simpler questions that can be answered by a web search. You must ask me 
         (the user) each question ONE BY ONE, using the `question_tool` in

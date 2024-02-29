@@ -1,5 +1,5 @@
 from typing import Any, Dict, List
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Depends, Request
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Json
 import uvicorn
@@ -31,7 +31,8 @@ class Server:
         # Perform your potentially expensive initial setup here
         self.agent = lr.ChatAgent()
 
-    def serve_text(self, text:str) -> str:
+    def serve_text(self, text:str, key:str|None=None) -> str:
+        os.environ["OPENAI_API_KEY"] = key or "xxx"
         result = self.agent.llm_response(text)
         return result.content
 
@@ -46,6 +47,26 @@ class Server:
 
 app = FastAPI()
 server = Server()
+
+
+# Dependency for API Key authentication
+async def extract_api_key(request: Request) -> str:
+    authorization: str = request.headers.get("Authorization")
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header missing")
+    try:
+        scheme, token = authorization.split()
+        if scheme.lower() != "bearer":
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid scheme in Authorization header"
+            )
+        return token
+    except ValueError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Authorization header format"
+        )
 
 @app.post("/process_file", response_class=FileResponse)
 async def process_file(file: UploadFile = File(...)) -> Any:
@@ -70,7 +91,17 @@ async def process_file(file: UploadFile = File(...)) -> Any:
 
 @app.post("/process_text")
 def process_text(text_input: TextInput) -> Any:
-    result = server.serve_text(text_input.text)
+    api_key = os.environ.get("OPENAI_API_KEY")
+    result = server.serve_text(text_input.text, key=api_key)
+    return {"message": result, "status": "ok"}
+
+# authenticated example
+@app.post("/process_text_auth")
+def process_text(
+    text_input: TextInput,
+    api_key:str = Depends(extract_api_key),
+) -> Any:
+    result = server.serve_text(text_input.text, key=api_key)
     return {"message": result, "status": "ok"}
 
 @app.post("/process_file_and_data/")
