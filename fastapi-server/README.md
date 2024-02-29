@@ -1,8 +1,16 @@
 # Setup a REST API server on GCP for a Langroid script
 
+Ensure that your env secrets are in this folder as a `.env` file.
+We will of course *not* include it in the docker image
+(which is why it's in the `.dockerignore` file) but we will use it
+for local testing by passing this file in as an env file to the uvicorn server.
+(See the defn of `make run` in the Makefile.)
+
 ## local testing
 
-Build server using `make server`, run it with `make run`
+Build server using `make server`, run it with `make run`.
+See the definitions of these in the Makefile. Notice that 
+we are passing in the env variables
 
 ## Curl examples to test the server locally
 
@@ -25,6 +33,13 @@ curl -X POST \
 ```
 (If you omit the `-o out.txt` part, the response will be printed to the terminal.)
 
+`process_file_and_data` endpoint:
+
+```bash
+curl -X POST "http://localhost:8000/process_file_and_data/" \
+     -F "file=@/tmp/query.txt" \
+     -F 'complex_data={"id": 1, "item": {"name": "Item Name", "description": "A description", "quantity": 10, "tags": ["tag1", "tag2"]}, "related_items": [{"name": "Related Item 1", "description": "Description 1", "quantity": 5, "tags": ["tag3", "tag4"]}, {"name": "Related Item 2", "description": "Description 2", "quantity": 3, "tags": ["tag5", "tag6"]}]}'
+```
 
 ## Deploy to google cloud run
 
@@ -36,20 +51,12 @@ See other details here:
 https://chat.openai.com/share/c34583c8-b88e-4a70-bf24-83229700c020
 
 
-Run these from within the dir where the Dockerfile is located:
-
-```bash
-gcloud auth configure-docker
-docker build -t gcr.io/langroid/langroid-server:v1 .
-docker push  gcr.io/langroid/langroid-server:v1
-```
-
-The `build` and `push` cmds are also available via the Makefile 
-as `make gbuild` and `make gpush` respectively.
+Run `make gserver`, `make gpush` from within the dir where the Dockerfile is 
+located.
 
 Go to Google Cloud Run Service and create a new service, 
-selecting the latest version of the pushed docker image above: 
-`gcr.io/langroid/langroid-server:v1`
+selecting the latest version of the pushed docker image above, e.g.: 
+`gcr.io/langroid/langroid-server:latest`
 
 When setting up the service:
 - ensure you select the same port number as in the Dockerfile, e.g. 80.
@@ -60,6 +67,33 @@ When setting up the service:
 If the service fails to start due to an error like `uvicorn: exec format error`, 
 then you may be able to fix it by explicitly choosing an architecture 
 in the Dockerfile, e.g. `linux/amd64` (which we chose in the Dockerfile).
+
+### Creating secrets in google cloud
+Some commands for quick reference:
+
+```bash
+gcloud secrets create openai-api-key --replication-policy="automatic"
+echo -n "your-openai-api-key" | gcloud secrets versions add openai-api-key --data-file=-
+```
+
+After creating your secret and adding its value, you may need to set appropriate 
+permissions for the secret. Use gcloud secrets add-iam-policy-binding to grant access 
+to the secret:
+
+```bash
+gcloud secrets add-iam-policy-binding openai-api-key \
+  --member="serviceAccount:langroid-docai-sa@langroid.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+To expose one of these as environment var named `OPENAI_API_KEY` in the cloud run 
+service:
+
+```bash
+gcloud run services update langroid-server \
+ --update-secrets OPENAI_API_KEY=openai-api-key:latest \
+ --region=us-east4
+```
 
 ## Test GCP endpoints
 

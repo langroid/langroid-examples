@@ -1,7 +1,7 @@
-from typing import Any
-from fastapi import FastAPI, File, UploadFile
+from typing import Any, Dict, List
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Json
 import uvicorn
 import os
 import langroid as lr
@@ -9,6 +9,19 @@ import langroid as lr
 
 class TextInput(BaseModel):
     text: str
+
+# Define your Pydantic models for the complex payload
+class Item(BaseModel):
+    name: str
+    description: str
+    quantity: int
+    tags: List[str]
+
+class ComplexItem(BaseModel):
+    id: int
+    item: Item
+    related_items: List[Item]
+
 
 class Server:
     def __init__(self):
@@ -59,6 +72,22 @@ async def process_file(file: UploadFile = File(...)) -> Any:
 def process_text(text_input: TextInput) -> Any:
     result = server.serve_text(text_input.text)
     return {"message": result, "status": "ok"}
+
+@app.post("/process_file_and_data/")
+async def process_file_and_data(
+    file: UploadFile = File(...),
+    complex_data: Json[ComplexItem] = Form(...)
+) -> Dict[str, Any]:
+    # You can now access the file and the complex data
+    # For example, save the file and process the complex data
+    # Here, just return a message indicating success for demonstration
+
+    return {
+        "message": "Received file and complex data successfully!",
+        "file_name": file.filename,
+        "complex_data_id": complex_data.id,
+        "complex_data_item_name": complex_data.item.name
+    }
 
 # This port number must match the port number in the Dockerfile
 if __name__ == "__main__":
