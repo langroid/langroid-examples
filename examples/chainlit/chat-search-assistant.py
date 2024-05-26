@@ -7,11 +7,20 @@ See that script for details.
 Run like this:
 
 chainlit run examples/chainlit/chat-search-assistant.py
+
+To run with a different LLM, set the MODEL environment variable:
+
+MODEL=ollama/mistral chainlit run examples/chainlit/chat-search-assistant.py
+
+or
+
+MODEL=groq/llama3-70b-8192 chainlit run examples/chainlit/chat-search-assistant.py
 """
 
 from dotenv import load_dotenv
 from textwrap import dedent
 
+import os
 import chainlit as cl
 import langroid as lr
 from langroid.agent.callbacks.chainlit import add_instructions
@@ -25,8 +34,8 @@ from langroid.utils.configuration import Settings, set_global
 async def main(
     debug: bool = False,
     # e.g. ollama/mistral or local/localhost:5000/v1 default is GPT4_TURBO
-    model: str = "",
-    provider: str = "ddg",  # or "google", "sciphi", "metaphor"
+    model: str = os.getenv("MODEL", ""),
+    provider: str = "metaphor",  # or "google", "metaphor"
     nocache: bool = False,
 ):
     set_global(
@@ -75,10 +84,6 @@ async def main(
     match provider:
         case "google":
             search_tool_class = GoogleSearchTool
-        case "sciphi":
-            from langroid.agent.tools.sciphi_search_rag_tool import SciPhiSearchRAGTool
-
-            search_tool_class = SciPhiSearchRAGTool
         case "metaphor":
             from langroid.agent.tools.metaphor_search_tool import MetaphorSearchTool
 
@@ -96,10 +101,13 @@ async def main(
         system_message=f"""
         You are a web-searcher. For any question you get, you must use the
         `{search_tool_handler_method}` tool/function-call to get up to 5 results.
+        I WILL SEND YOU THE RESULTS; DO NOT MAKE UP THE RESULTS!!
         Once you receive the results, you must compose a CONCISE answer 
         based on the search results and say DONE and show the answer to me,
         in this format:
         DONE [... your CONCISE answer here ...]
+        IMPORTANT: YOU MUST WAIT FOR ME TO SEND YOU THE 
+        SEARCH RESULTS BEFORE saying you're DONE.
         """,
     )
     search_agent = lr.ChatAgent(search_agent_config)

@@ -10,6 +10,7 @@ Run as follows:
 python3 examples/quick-start/two-agent-chat.py
 
 """
+
 import typer
 
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
@@ -26,15 +27,15 @@ setup_colored_logging()
 
 def chat() -> None:
     config = ChatAgentConfig(
-        llm = OpenAIGPTConfig(
+        llm=OpenAIGPTConfig(
             chat_model=OpenAIChatModel.GPT4,
         ),
-        vecdb = None,
+        vecdb=None,
     )
     student_agent = ChatAgent(config)
     student_task = Task(
         student_agent,
-        name = "Student",
+        name="Student",
         system_message="""
         Your task is to write 3 short bullet points about 
         Language Models in the context of Machine Learning. 
@@ -47,7 +48,7 @@ def chat() -> None:
     expert_agent = ChatAgent(config)
     expert_task = Task(
         expert_agent,
-        name = "Expert",
+        name="Expert",
         system_message="""
         You are an expert on Language Models in Machine Learning. 
         You will receive questions on this topic, and you must answer these
@@ -62,9 +63,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     set_global(
         Settings(

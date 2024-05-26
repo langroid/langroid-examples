@@ -12,6 +12,7 @@ python3 examples/quick-start/chat-agent-docs.py
 For more explanation see
 [the Getting Started guide](https://langroid.github.io/langroid/quick-start/chat-agent-docs/).
 """
+
 import typer
 from rich import print
 import langroid as lr
@@ -21,7 +22,7 @@ app = typer.Typer()
 lr.utils.logging.setup_colored_logging()
 
 
-documents =[
+documents = [
     lr.mytypes.Document(
         content="""
             In the year 2050, GPT10 was released. 
@@ -60,9 +61,8 @@ def chat() -> None:
         """
     )
 
-
     config = lr.agent.special.DocChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
+        llm=lr.language_models.OpenAIGPTConfig(
             chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
         vecdb=lr.vector_store.QdrantDBConfig(
@@ -73,7 +73,7 @@ def chat() -> None:
             separators=["\n\n"],
             splitter=lr.parsing.parser.Splitter.SIMPLE,
             n_similar_docs=2,
-        )
+        ),
     )
     agent = lr.agent.special.DocChatAgent(config)
     agent.ingest_docs(documents)
@@ -83,9 +83,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     lr.utils.configuration.set_global(
         lr.utils.configuration.Settings(

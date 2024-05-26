@@ -14,18 +14,28 @@ This example relies on neo4j. The easiest way to get access to neo4j is by
 creating a cloud account at `https://neo4j.com/cloud/platform/aura-graph-database/`
 
 Upon creating the account successfully, neo4j will create a text file that contains
-account settings, please provide the following information (uri, username, password),
-while creating the constructor `Neo4jConfig`.
+account settings, please provide the following information (uri, username, password) as
+described here
+`https://github.com/langroid/langroid/tree/main/examples/kg-chat#requirements`
+
+The rest of requirements are described in
+ `https://github.com/langroid/langroid/blob/main/examples/kg-chat/README.md`
 
 Run like this:
 ```
 python3 examples/kg-chat/dependency_chatbot.py
 ```
 """
+
 import typer
 from rich import print
 from rich.prompt import Prompt
 from dotenv import load_dotenv
+
+from pyvis.network import Network
+import webbrowser
+from pathlib import Path
+
 
 from langroid.agent.special.neo4j.neo4j_chat_agent import (
     Neo4jChatAgent,
@@ -40,7 +50,6 @@ from langroid.agent.tools.google_search_tool import GoogleSearchTool
 
 from langroid.agent.task import Task
 from cypher_message import CONSTRUCT_DEPENDENCY_GRAPH
-
 
 app = typer.Typer()
 
@@ -59,9 +68,18 @@ class DepGraphTool(ToolMessage):
     package_name: str
 
 
-class DependencyGraphAgent(Neo4jChatAgent):
+class VisualizeGraph(ToolMessage):
+    request = "visualize_dependency_graph"
+    purpose = """
+      Use this tool/function to display the dependency graph.
+      """
+    package_version: str
+    package_type: str
     package_name: str
+    query: str
 
+
+class DependencyGraphAgent(Neo4jChatAgent):
     def construct_dependency_graph(self, msg: DepGraphTool) -> None:
         check_db_exist = (
             "MATCH (n) WHERE n.name = $name AND n.version = $version RETURN n LIMIT 1"
@@ -69,8 +87,8 @@ class DependencyGraphAgent(Neo4jChatAgent):
         response = self.read_query(
             check_db_exist, {"name": msg.package_name, "version": msg.package_version}
         )
-        if "No records found" not in response:
-            self.config.database_created = True
+        if response.success and response.data:
+            # self.config.database_created = True
             return "Database Exists"
         else:
             construct_dependency_graph = CONSTRUCT_DEPENDENCY_GRAPH.format(
@@ -78,7 +96,8 @@ class DependencyGraphAgent(Neo4jChatAgent):
                 package_name=msg.package_name,
                 package_version=msg.package_version,
             )
-            if self.write_query(construct_dependency_graph):
+            response = self.write_query(construct_dependency_graph)
+            if response.success:
                 self.config.database_created = True
                 return "Database is created!"
             else:
@@ -87,26 +106,117 @@ class DependencyGraphAgent(Neo4jChatAgent):
                     Seems the package {msg.package_name} is not found,
                     """
 
+    def visualize_dependency_graph(self, msg: VisualizeGraph) -> str:
+        """
+        Visualizes the dependency graph based on the provided message.
+
+        Args:
+            msg (VisualizeGraph): The message containing the package info.
+
+        Returns:
+            str: response indicates whether the graph is displayed.
+        """
+        # Query to fetch nodes and relationships
+        # TODO: make this function more general to return customized graphs
+        # i.e, displays paths or subgraphs
+        query = """
+            MATCH (n)
+            OPTIONAL MATCH (n)-[r]->(m)
+            RETURN n, r, m
+        """
+
+        query_result = self.read_query(query)
+        nt = Network(notebook=False, height="750px", width="100%", directed=True)
+
+        node_set = set()  # To keep track of added nodes
+
+        for record in query_result.data:
+            # Process node 'n'
+            if "n" in record and record["n"] is not None:
+                node = record["n"]
+                # node_id = node.get("id", None)  # Assuming each node has a unique 'id'
+                node_label = node.get("name", "Unknown Node")
+                node_title = f"Version: {node.get('version', 'N/A')}"
+                node_color = "blue" if node.get("imported", False) else "green"
+
+                # Check if node has been added before
+                if node_label not in node_set:
+                    nt.add_node(
+                        node_label, label=node_label, title=node_title, color=node_color
+                    )
+                    node_set.add(node_label)
+
+            # Process relationships and node 'm'
+            if (
+                "r" in record
+                and record["r"] is not None
+                and "m" in record
+                and record["m"] is not None
+            ):
+                source = record["n"]
+                target = record["m"]
+                relationship = record["r"]
+
+                source_label = source.get("name", "Unknown Node")
+                target_label = target.get("name", "Unknown Node")
+                relationship_label = (
+                    relationship[1]
+                    if isinstance(relationship, tuple) and len(relationship) > 1
+                    else "Unknown Relationship"
+                )
+
+                # Ensure both source and target nodes are added before adding the edge
+                if source_label not in node_set:
+                    source_title = f"Version: {source.get('version', 'N/A')}"
+                    source_color = "blue" if source.get("imported", False) else "green"
+                    nt.add_node(
+                        source_label,
+                        label=source_label,
+                        title=source_title,
+                        color=source_color,
+                    )
+                    node_set.add(source_label)
+                if target_label not in node_set:
+                    target_title = f"Version: {target.get('version', 'N/A')}"
+                    target_color = "blue" if target.get("imported", False) else "green"
+                    nt.add_node(
+                        target_label,
+                        label=target_label,
+                        title=target_title,
+                        color=target_color,
+                    )
+                    node_set.add(target_label)
+
+                nt.add_edge(source_label, target_label, title=relationship_label)
+
+        nt.options.edges.font = {"size": 12, "align": "top"}
+        nt.options.physics.enabled = True
+        nt.show_buttons(filter_=["physics"])
+
+        output_file_path = "neo4j_graph.html"
+        nt.write_html(output_file_path)
+
+        # Try to open the HTML file in a browser
+        try:
+            abs_file_path = str(Path(output_file_path).resolve())
+            webbrowser.open("file://" + abs_file_path, new=2)
+        except Exception as e:
+            print(f"Failed to automatically open the graph in a browser: {e}")
+
 
 @app.command()
 def main(
     debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
     model: str = typer.Option("", "--model", "-m", help="model name"),
-    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
     tools: bool = typer.Option(
         False, "--tools", "-t", help="use langroid tools instead of function-calling"
     ),
     nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
-    cache_type: str = typer.Option(
-        "redis", "--cachetype", "-ct", help="redis or momento"
-    ),
 ) -> None:
     set_global(
         Settings(
             debug=debug,
             cache=nocache,
-            stream=not no_stream,
-            cache_type=cache_type,
         )
     )
     print(
@@ -144,7 +254,7 @@ def main(
     
     DON'T forget to include the package name in your questions. 
       
-    After receiving this infomration, make sure the package version is a number and the
+    After receiving this information, make sure the package version is a number and the
     package type is PyPi.
     THEN ask the user if they want to construct the dependency graph,
     and if so, use the tool/function `construct_dependency_graph` to construct
@@ -155,10 +265,11 @@ def main(
     You will try your best to answer my questions. Note that:
     1. You can use the tool `get_schema` to get node label and relationships in the
     dependency graph. 
-    2. You can use the tool `make_query` to get relevant information from the
+    2. You can use the tool `retrieval_query` to get relevant information from the
       graph database. I will execute this query and send you back the result.
       Make sure your queries comply with the database schema.
     3. Use the `web_search` tool/function to get information if needed.
+    To display the dependency graph use this tool `visualize_dependency_graph`.
     """
     task = Task(
         dependency_agent,
@@ -168,6 +279,7 @@ def main(
 
     dependency_agent.enable_message(DepGraphTool)
     dependency_agent.enable_message(GoogleSearchTool)
+    dependency_agent.enable_message(VisualizeGraph)
 
     task.run()
 

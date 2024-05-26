@@ -24,17 +24,31 @@ lr.utils.logging.setup_colored_logging()
 
 NO_ANSWER = lr.utils.constants.NO_ANSWER
 
-def chat() -> None:
+
+@app.command()
+def main(
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    model: str = typer.Option("", "--model", "-m", help="model name"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+) -> None:
+    lr.utils.configuration.set_global(
+        lr.utils.configuration.Settings(
+            debug=debug,
+            cache=not nocache,
+            stream=not no_stream,
+        )
+    )
     config = lr.ChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
-            chat_model=lr.language_models.OpenAIChatModel.GPT4,
+        llm=lr.language_models.OpenAIGPTConfig(
+            chat_model=model or lr.language_models.OpenAIChatModel.GPT4,
         ),
         vecdb=None,
     )
     processor_agent = lr.ChatAgent(config)
     processor_task = lr.Task(
         processor_agent,
-        name = "Processor",
+        name="Processor",
         system_message="""
         You will receive a list of numbers from the user.
         Your goal is to apply a transformation to each number.
@@ -47,13 +61,12 @@ def chat() -> None:
         Once you have accomplished your goal, say DONE and show the result.
         Start by asking the user for the list of numbers.
         """,
-        llm_delegate=True,
         single_round=False,
     )
     even_agent = lr.ChatAgent(config)
     even_task = lr.Task(
         even_agent,
-        name = "EvenHandler",
+        name="EvenHandler",
         system_message=f"""
         You will be given a number. 
         If it is even, divide by 2 and say the result, nothing else.
@@ -65,7 +78,7 @@ def chat() -> None:
     odd_agent = lr.ChatAgent(config)
     odd_task = lr.Task(
         odd_agent,
-        name = "OddHandler",
+        name="OddHandler",
         system_message=f"""
         You will be given a number n. 
         If it is odd, return (n*3+1), say nothing else. 
@@ -76,22 +89,6 @@ def chat() -> None:
 
     processor_task.add_sub_task([even_task, odd_task])
     processor_task.run()
-
-
-@app.command()
-def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
-) -> None:
-    lr.utils.configuration.set_global(
-        lr.utils.configuration.Settings(
-            debug=debug,
-            cache=not nocache,
-            stream=not no_stream,
-        )
-    )
-    chat()
 
 
 if __name__ == "__main__":

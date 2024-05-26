@@ -14,6 +14,7 @@ See here for how to set up a Local LLM to work with Langroid:
 https://langroid.github.io/langroid/tutorials/local-llm-setup/
 
 """
+
 import os
 import fire
 
@@ -42,7 +43,6 @@ def app(
         chat_context_length=4096,  # set this based on model
         max_output_tokens=100,
         temperature=0.2,
-        stream=True,
         timeout=45,
     )
 

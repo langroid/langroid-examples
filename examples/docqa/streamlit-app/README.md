@@ -1,10 +1,3 @@
-⚠️This example is deprecated, and only kept for historical reasons.
-Streamlit is _not_ the recommended way to build chat apps using Langroid.
-Chainlit is a far better choice; see several examples under `examples/chainlit`:
-https://github.com/langroid/langroid-examples/tree/main/examples/chainlit
-
-
-
 # Basic example: chat with a document using Langroid with local LLM or OpenAI LLM
 
 Bare-bones example of an app that combines:
@@ -28,8 +21,34 @@ GPT4-Turbo model.
 
 ## Local LLMs
 
-See here for instructions on setting up local LLMs: 
-https://langroid.github.io/langroid/tutorials/local-llm-setup/
+Here are instructions to use this with a Local LLM spun up via [ollama](https://github.com/jmorganca/ollama)
+(see their GitHub repo for more details but the below should suffice):
+
+(1) Mac: Install latest ollama, then do this:
+```bash
+ollama pull mistral:7b-instruct-v0.2-q4_K_M
+```
+
+(2) Ensure you've installed the `litellm` extra with Langroid, e.g.
+```bash
+pip install langroid[litellm]
+``` 
+or if you use the `pyproject.toml` in this repo you can simply use `poetry install`
+
+In the app sidebar you can then specify the model as:
+```
+litellm/ollama/mistral:7b-instruct-v0.2-q4_K_M
+```
+
+Other possibilities for local_model are:
+- If instead of ollama (perhaps using ooba text-generation-webui)
+  you've spun up your local LLM to listen at an OpenAI-Compatible Endpoint
+  like `localhost:8000`, then you can use specify the local LLM as `local/localhost:8000`
+- If the endpoint is listening at `https://localhost:8000/v1`, you must include the `v1`, i.e.
+  `local/localhost:8000/v1`
+- If the endpoint is `http://127.0.0.1:8000`, then specify `local/127.0.0.1:8000`
+
+And so on. The above are few-shot examples for you. You get the idea!
 
 ## Limitations
 

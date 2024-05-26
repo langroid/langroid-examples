@@ -6,6 +6,7 @@ who has access to the docs via a vector-db.
 
 python3 examples/docqa/doc-chat-2.py
 """
+
 from rich import print
 from rich.prompt import Prompt
 import os
@@ -14,11 +15,11 @@ from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
     DocChatAgentConfig,
 )
+import langroid.language_models as lm
 from langroid.mytypes import Entity
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
 from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.task import Task
-from langroid.language_models.openai_gpt import OpenAIGPTConfig
 from langroid.agent.tools.recipient_tool import RecipientTool
 from langroid.utils.configuration import set_global, Settings
 from langroid.utils.constants import NO_ANSWER
@@ -30,8 +31,11 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 def main(
     debug: bool = False,
     nocache: bool = False,
+    model: str = lm.OpenAIChatModel.GPT4o,
 ) -> None:
+    llm_config = lm.OpenAIGPTConfig(chat_model=model)
     config = DocChatAgentConfig(
+        llm=llm_config,
         n_query_rephrases=0,
         hypothetical_answer=False,
         assistant_mode=True,
@@ -63,7 +67,6 @@ def main(
         )
     )
 
-
     doc_agent = DocChatAgent(config)
     print("[blue]Welcome to the document chatbot!")
     doc_agent.user_docs_ingest_dialog()
@@ -79,7 +82,7 @@ def main(
     writer_agent = ChatAgent(
         ChatAgentConfig(
             name="WriterAgent",
-            llm=OpenAIGPTConfig(),
+            llm=llm_config,
             vecdb=None,
         )
     )
@@ -127,7 +130,7 @@ def main(
         query = Prompt.ask("[blue]How can I help?")
         if query in ["x", "q"]:
             break
-        answer = writer_task.run(query)
+        writer_task.run(query)
 
 
 if __name__ == "__main__":

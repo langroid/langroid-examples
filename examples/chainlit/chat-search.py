@@ -14,6 +14,7 @@ and you have your OpenAI API Key in the .env file, run like this:
 
 chainlit run examples/chainlit/chat-search.py
 """
+
 from typing import Optional
 
 import chainlit as cl
@@ -28,6 +29,9 @@ from langroid.agent.callbacks.chainlit import (
     update_llm,
 )
 from textwrap import dedent
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def search_system_message(search_tool: lr.ToolMessage) -> str:
@@ -52,7 +56,7 @@ class SearchAgent(lr.ChatAgent):
         if response is None:
             return None
         content = response.content
-        search_tool = DuckduckgoSearchTool
+        search_tool = MetaphorSearchTool
         if content.startswith("/"):
             match content[1]:
                 case "d":
@@ -78,10 +82,6 @@ async def setup_agent_task(search_tool: lr.ToolMessage):
     # set up LLM and LLMConfig from settings state
     await setup_llm()
     llm_config = cl.user_session.get("llm_config")
-    if task := cl.user_session.get("task"):
-        # task already exists and is running, so we just update the agent's llm config
-        task.agent.config.llm = llm_config
-        return
     sys_msg = search_system_message(search_tool)
     config = lr.ChatAgentConfig(
         llm=llm_config,
@@ -98,7 +98,7 @@ async def setup_agent_task(search_tool: lr.ToolMessage):
 @cl.on_settings_update
 async def on_update(settings):
     await update_llm(settings)
-    await setup_agent_task(DuckduckgoSearchTool)
+    await setup_agent_task(MetaphorSearchTool)
 
 
 @cl.on_chat_start
@@ -127,7 +127,7 @@ async def on_chat_start():
     )
 
     await make_llm_settings_widgets()
-    await setup_agent_task(DuckduckgoSearchTool)
+    await setup_agent_task(MetaphorSearchTool)
 
 
 @cl.on_message

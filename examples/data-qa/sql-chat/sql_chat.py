@@ -10,13 +10,13 @@ Note if you are using this with a postgres db, you will need to:
     or `poetry add langroid[postgres]` or `poetry install -E postgres`.
     If this gives you an error, try `pip install psycopg2-binary` in your virtualenv.
 """
+
 import typer
 from rich import print
 from rich.prompt import Prompt
 from typing import Dict, Any
 import json
 import os
-from pydantic import BaseSettings
 
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine import Engine
@@ -30,13 +30,13 @@ from langroid.agent.special.sql.sql_chat_agent import (
 from langroid.agent.task import Task
 from langroid.language_models.openai_gpt import OpenAIChatModel, OpenAIGPTConfig
 from langroid.utils.configuration import set_global, Settings
-from langroid.utils.logging import setup_colored_logging
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 app = typer.Typer()
+
 
 def create_descriptions_file(filepath: str, engine: Engine) -> None:
     """
@@ -113,6 +113,7 @@ def load_context_descriptions(engine: Engine) -> dict:
             print(
                 f"[red]The file '{filepath}' is not a valid JSON file. Please try again."
             )
+
 
 @app.command()
 def main(

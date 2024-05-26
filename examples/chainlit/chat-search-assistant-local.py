@@ -10,6 +10,7 @@ https://langroid.github.io/langroid/tutorials/local-llm-setup/
 
 
 """
+
 from typing import List, Optional, Type
 
 from dotenv import load_dotenv
@@ -30,7 +31,7 @@ class QuestionTool(lr.ToolMessage):
     question: str
 
     @classmethod
-    def examples(cls) -> List["lr.ToolMessage"]:
+    def examples(cls) -> List[lr.ToolMessage]:
         return [
             cls(question="Which superconductor material was discovered in 2023?"),
             cls(question="What AI innovation did Meta achieve in 2024?"),
@@ -314,7 +315,7 @@ async def main(
 
     assistant_config = lr.ChatAgentConfig(
         system_message="""
-        You are a resourceful assistant, able to think step by step to answer complex
+        You are a resourceful assistant, able to think step by step to answer
         complex questions from the user. You must break down complex questions into
         simpler questions that can be answered by a web search. You must ask me 
         (the user) each question ONE BY ONE, using the `question_tool` in

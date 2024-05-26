@@ -50,7 +50,7 @@
                 },
                 "inputBox": {
                     "input": {
-                        "placeholder": "Type your message here..."
+                        "placeholder": "Ask, respond, give feedback, or just 'c' for continue..."
                     },
                     "speechButton": {
                         "start": "Start recording",

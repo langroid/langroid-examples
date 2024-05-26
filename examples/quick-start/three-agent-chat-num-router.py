@@ -33,20 +33,20 @@ app = typer.Typer()
 lr.utils.logging.setup_colored_logging()
 
 
-def chat(tools:bool=False) -> None:
+def chat(tools: bool = False) -> None:
     config = lr.ChatAgentConfig(
-        llm = lr.language_models.OpenAIGPTConfig(
+        llm=lr.language_models.OpenAIGPTConfig(
             chat_model=lr.language_models.OpenAIChatModel.GPT4,
         ),
-        use_tools = tools,
-        use_functions_api = not tools,
-        vecdb = None,
+        use_tools=tools,
+        use_functions_api=not tools,
+        vecdb=None,
     )
     processor_agent = lr.ChatAgent(config)
     processor_agent.enable_message(lr.agent.tools.RecipientTool)
     processor_task = lr.Task(
         processor_agent,
-        name = "Processor",
+        name="Processor",
         system_message="""
         You will receive a list of numbers from me (the user).
         Your goal is to apply a transformation to each number.
@@ -73,7 +73,7 @@ def chat(tools:bool=False) -> None:
     even_agent = lr.ChatAgent(config)
     even_task = lr.Task(
         even_agent,
-        name = "EvenHandler",
+        name="EvenHandler",
         system_message="""
         You will be given a number. 
         If it is even, divide by 2 and say the result, nothing else.
@@ -85,7 +85,7 @@ def chat(tools:bool=False) -> None:
     odd_agent = lr.ChatAgent(config)
     odd_task = lr.Task(
         odd_agent,
-        name = "OddHandler",
+        name="OddHandler",
         system_message="""
         You will be given a number n. 
         If it is odd, return (n*3+1), say nothing else. 
@@ -100,12 +100,15 @@ def chat(tools:bool=False) -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
-        tools: bool = typer.Option(
-            False, "--tools", "-t",
-            help="use langroid tools instead of OpenAI function-calling"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    tools: bool = typer.Option(
+        False,
+        "--tools",
+        "-t",
+        help="use langroid tools instead of OpenAI function-calling",
+    ),
 ) -> None:
     lr.utils.configuration.set_global(
         lr.utils.configuration.Settings(

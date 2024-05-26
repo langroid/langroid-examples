@@ -6,6 +6,7 @@ and you have your OpenAI API Key in the .env file, run like this:
 
 chainlit run examples/chainlit/chat-with-task.py
 """
+
 import langroid as lr
 import chainlit as cl
 from langroid.agent.callbacks.chainlit import (
@@ -26,9 +27,6 @@ async def on_settings_update(settings: cl.ChatSettings):
 async def setup_agent_task():
     await setup_llm()
     llm_config = cl.user_session.get("llm_config")
-    if task := cl.user_session.get("task"):
-        task.agent.config.llm = llm_config
-        return
 
     config = lr.ChatAgentConfig(
         llm=llm_config,
@@ -43,15 +41,18 @@ async def setup_agent_task():
     )
     cl.user_session.set("task", task)
 
+
 @cl.on_chat_start
 async def on_chat_start():
     await add_instructions(
         title="Basic Langroid Chatbot",
-        content=dedent("""
+        content=dedent(
+            """
         Uses Langroid's `Task.run()`. 
         Before starting the chat, 
         you can change LLM settings by clicking the settings icon next to the chat window.
-        """),
+        """
+        ),
     )
     await make_llm_settings_widgets()
     await setup_agent_task()

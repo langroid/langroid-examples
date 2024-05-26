@@ -9,6 +9,7 @@ python3 examples/quick-start/try-llm.py
 For more explanation see the
 [Getting Started guide](https://langroid.github.io/langroid/quick-start/llm-interaction/)
 """
+
 import typer
 from rich import print
 from rich.prompt import Prompt
@@ -19,6 +20,7 @@ Role = lr.language_models.Role
 LLMMessage = lr.language_models.LLMMessage
 
 app = typer.Typer()
+
 
 def chat() -> None:
     print("[blue]Welcome to langroid!")
@@ -48,9 +50,9 @@ def chat() -> None:
 
 @app.command()
 def main(
-        debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
-        no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
-        nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
+    debug: bool = typer.Option(False, "--debug", "-d", help="debug mode"),
+    no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
+    nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
     lr.utils.configuration.set_global(
         lr.utils.configuration.Settings(
