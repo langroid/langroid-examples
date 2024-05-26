@@ -1,11 +1,13 @@
 # langroid-examples
 
-:warning: The examples in the core langroid repo are generally more updated.
-We occasionally update this repo with the latest versions from the langroid repo.
-However there are some examples in this repo that are not in the core langroid repo.
 
-Examples of using the [Langroid](https://github.com/langroid/langroid) 
-Multi-Agent Programming framework to build LLM applications.
+Examples of using the [Langroid](https://github.com/langroid/langroid) Multi-Agent 
+Programming framework to build LLM applications.
+
+:warning: Many of the examples in the `examples` folder in this repo are copied
+from the corresponding folder in the core [langroid](https://github.com/langroid/langroid) repo, although the core repo is  generally more updated.
+We occasionally update this repo with the latest versions from the langroid repo.
+However, there are some examples in this repo that are not in the core langroid repo.
 
 ## Set up virtual env and install `langroid`
 

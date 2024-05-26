@@ -1,5 +1,7 @@
 # Setup a REST API server on GCP for a Langroid script
 
+:warning: See the [langroid/fastapi-server](https://github.com/langroid/fastapi-server) repo for a more comprehensive and up-to-date example.
+
 Ensure that your env secrets are in this folder as a `.env` file.
 We will of course *not* include it in the docker image
 (which is why it's in the `.dockerignore` file) but we will use it
