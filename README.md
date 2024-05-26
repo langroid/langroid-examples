@@ -1,5 +1,9 @@
 # langroid-examples
 
+:warning: The examples in the core langroid repo are generally more updated.
+We occasionally update this repo with the latest versions from the langroid repo.
+However there are some examples in this repo that are not in the core langroid repo.
+
 Examples of using the [Langroid](https://github.com/langroid/langroid) 
 Multi-Agent Programming framework to build LLM applications.
 
