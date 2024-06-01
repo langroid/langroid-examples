@@ -27,13 +27,13 @@ python3 -m venv .venv
 . .venv/bin/activate
 
 # install dependencies from pyproject.toml:
-# This installs langroid with extras.
+# This installs langroid with "all" extras.
 poetry install 
 # or equivalently:
-# pip install "langroid[litellm,hf-embeddings,postgres,mysql]"
+# pip install "langroid[all]"
 
 # or to update an existing installation:
-pip install --upgrade "langroid[litellm,hf-embeddings,postgres,mysql]"
+pip install --upgrade "langroid[all]"
 ```
 
 Once you have the environment setup, you can either:
