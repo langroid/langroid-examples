@@ -33,6 +33,9 @@ multi_modal = true
     # See all languages here https://github.com/JamesBrill/react-speech-recognition/blob/HEAD/docs/API.md#language-string
     # language = "en-US"
 
+[features.spontaneous_file_upload]
+    enabled=true
+
 [UI]
 # Name of the app and chatbot.
 name = "Chatbot"
