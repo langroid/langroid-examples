@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "examples"}]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = "^3.10"
 langroid = {version=">=0.2.6", extras = ["all"]}
 
 
