@@ -181,7 +181,7 @@ def main(
             birth_year=1958,
             death_year=2016,
             type="musician",
-            genre="rock",
+            genre="rock",1
         ),
         jackson=MusicianMetadata(
             name="Jackson",
