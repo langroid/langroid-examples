@@ -1,6 +1,7 @@
 """
-Single-agent question-answering system that has access to DuckDuckGo (DDG) Search when needed,
-and in case a DDG Search is used, ingests contents into a vector-db,
+This is a single-agent question-answering system that has access to a Web-Search
+Tool when needed,
+and in case a web search is used, ingests scraped link contents into a vector-db,
 and uses Retrieval Augmentation to answer the question.
 
 Run like this:
@@ -19,12 +20,14 @@ https://langroid.github.io/langroid/tutorials/local-llm-setup/
 """
 
 import re
-from typing import List
+from typing import List, Any
 
 from rich import print
 from rich.prompt import Prompt
 
+import langroid as lr
 import langroid.language_models as lm
+from langroid.agent.tools.orchestration import ForwardTool
 from langroid.agent.tool_message import ToolMessage
 from langroid.agent.chat_agent import ChatAgent, ChatDocument
 from langroid.agent.special.doc_chat_agent import (
@@ -86,6 +89,10 @@ class SearchDocChatAgent(DocChatAgent):
         query: None | str | ChatDocument = None,
     ) -> ChatDocument | None:
         return ChatAgent.llm_response(self, query)
+
+    def handle_message_fallback(self, msg: str | ChatDocument) -> Any:
+        if isinstance(msg, ChatDocument) and msg.metadata.sender == lr.Entity.LLM:
+            return ForwardTool(agent="user")
 
     def relevant_extracts(self, msg: RelevantExtractsTool) -> str:
         """Get docs/extracts relevant to the query, from vecdb"""
@@ -211,7 +218,7 @@ def main(
 
     agent.vecdb.set_collection(collection_name, replace=replace)
 
-    task = Task(agent)
+    task = Task(agent, interactive=False)
     task.run("Can you help me answer some questions, possibly using web search?")
 
 
