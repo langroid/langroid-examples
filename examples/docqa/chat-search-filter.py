@@ -176,7 +176,7 @@ class SearchDocChatAgent(DocChatAgent):
         # just ingest the specific link in the query
         if "http" in query:
             # extract the URL from the query
-            url = re.search("(?P<url>https?://[^\s]+)", query).group("url")
+            url = re.search(r"(?P<url>https?://[^\s]+)", query).group("url")
             links = [url]
             # remove the url from the query
             query = re.sub(r"http\S+", "", query)
