@@ -27,5 +27,5 @@ exclude = [
 ]
 
 [project.scripts]
-chat = "examples.basic.chat:cli"
-completion = "examples.basic.completion:cli"
+chat = "examples.basic.chat"
+completion = "examples.basic.completion"
