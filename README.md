@@ -9,11 +9,13 @@ from the corresponding folder in the core [langroid](https://github.com/langroid
 We occasionally update this repo with the latest versions from the langroid repo.
 However, there are some examples in this repo that are not in the core langroid repo.
 
-## Set up various keys in the `.env` file
+## Set up various keys in the `.env` file or as environment variables
 
 Many of the examples require API keys for LLMs, vector-stores, redis-cache, etc.
 Follow the instructions in the main [langroid](https://github.com/langroid/langroid) 
-repo to set up these keys in the `.env` file. 
+repo to set up these keys in the `.env` file,
+or explicitly set the environment variables in your shell 
+using, e.g., `export GEMINI_API_KEY=your_key`.
 
 
 ## Use `uv` to run the examples

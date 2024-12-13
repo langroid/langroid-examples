@@ -30,3 +30,37 @@ stage:
 	@cd $(EXAMPLES) && git ls-files -m --exclude-standard | xargs -r git add
 	@echo "Staging newly tracked files..."
 	@cd $(EXAMPLES) && bash -c "comm -23 <(cd $(LANGROID) && git ls-files | sort) <(cd $(EXAMPLES) && git ls-files | sort)" | xargs -r git add
+
+.PHONY: patch minor major
+
+current_version := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2)
+
+patch:
+	@echo "Current version: ${current_version}"
+	@new_version=$$(python -c "import semver; print(semver.VersionInfo.parse('${current_version}').bump_patch())") && \
+	sed -i '' "s/^version = .*/version = \"$$new_version\"/" pyproject.toml && \
+	git add pyproject.toml && \
+	git commit -m "Bump version to $$new_version" && \
+	git tag -a "v$$new_version" -m "Version $$new_version" && \
+	git push && git push --tags
+
+minor:
+	@echo "Current version: ${current_version}"
+	@new_version=$$(python -c "import semver; print(semver.VersionInfo.parse('${current_version}').bump_minor())") && \
+	sed -i '' "s/^version = .*/version = \"$$new_version\"/" pyproject.toml && \
+	git add pyproject.toml && \
+	git commit -m "Bump version to $$new_version" && \
+	git tag -a "v$$new_version" -m "Version $$new_version" && \
+	git push && git push --tags
+
+major:
+	@echo "Current version: ${current_version}"
+	@new_version=$$(python -c "import semver; print(semver.VersionInfo.parse('${current_version}').bump_major())") && \
+	sed -i '' "s/^version = .*/version = \"$$new_version\"/" pyproject.toml && \
+	git add pyproject.toml && \
+	git commit -m "Bump version to $$new_version" && \
+	git tag -a "v$$new_version" -m "Version $$new_version" && \
+	git push && git push --tags
+
+setup:
+	pip install semver
