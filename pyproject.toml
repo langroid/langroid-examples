@@ -1,18 +1,14 @@
-[tool.poetry]
-name = "langroid-examples"
+[project]
+name = "examples"
 version = "0.1.0"
-description = ""
-authors = ["Prasad Chalasani <pchalasani@gmail.com>"]
-license = "MIT"
+description = "Add your description here"
 readme = "README.md"
-packages = [{include = "examples"}]
+requires-python = ">=3.11"
+dependencies = [
+    "ipython>=8.30.0",
+    "langroid[all]>=0.27.4",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-langroid = {version=">=0.2.6", extras = ["all"]}
 
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.packaging]
+warn = false
