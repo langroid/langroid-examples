@@ -20,6 +20,8 @@ using, e.g., `export GEMINI_API_KEY=your_key`.
 
 ## Use `uv` to run the examples
 
+First clone this repo, then go to the root dir (e.g., `cd langroid-examples`).
+
 Install `uv`, see [here](https://docs.astral.sh/uv/getting-started/installation/)
 
 Then run any of the examples as in the examples below:
@@ -46,6 +48,22 @@ see the specific scripts for details:
 
 All of the examples are best run on the command-line, preferably in a nice
 terminal like [Iterm2](https://iterm2.com/).
+
+## Run scripts with No repo cloning, No venv setup
+
+In `pyproject.toml` we've set up some specific scripts to be runnable 
+from anywhere, without cloning this repo, and without setting up any venv etc,
+simply by using `uvx`, e.g.:
+
+```bash
+uvx --from langroid-examples chat
+uvx --from langroid-examples completion
+uvx --from langroid-examples chatdoc
+uvx --from langroid-examples chatsearch
+```
+
+We'll add more scripts to this list as needed.
+ 
 
 ## For developers/contributors
 
