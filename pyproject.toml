@@ -1,6 +1,6 @@
 [project]
 name = "langroid-examples"
-version = "0.1.4"
+version = "0.1.9"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -9,6 +9,12 @@ dependencies = [
     "langroid[all]>=0.27.4",
     "semver>=3.0.2",
 ]
+
+[project.scripts]
+chat = "examples.basic.chat"
+completion = "examples.basic.completion"
+chatdoc = "examples.docqa.chat"
+chatsearch = "examples.docqa.chat-search"
 
 
 [tool.packaging]
@@ -26,6 +32,3 @@ exclude = [
     "**/node_modules/**",
 ]
 
-[project.scripts]
-chat = "examples.basic.chat"
-completion = "examples.basic.completion"
