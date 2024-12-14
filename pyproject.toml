@@ -11,9 +11,9 @@ dependencies = [
 ]
 
 [project.scripts]
-chat = "examples.basic.chat:cli"
+chat = "examples.basic.chat"
 #completion = "examples.basic.completion"
-chatdoc = "examples.docqa.chat:cli"
+chatdoc = "examples.docqa.chat"
 
 
 

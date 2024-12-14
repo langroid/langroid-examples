@@ -40,8 +40,6 @@ app = typer.Typer()
 
 # Create classes for non-OpenAI model configs
 
-def cli():
-    app()
 
 @app.command()
 def main(

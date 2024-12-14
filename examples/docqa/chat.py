@@ -36,8 +36,6 @@ app = typer.Typer()
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-def cli():
-    app()
 
 @app.command()
 def main(
