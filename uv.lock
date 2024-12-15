@@ -1803,7 +1803,7 @@ all = [
 
 [[package]]
 name = "langroid-examples"
-version = "0.1.15"
+version = "0.1.24"
 source = { editable = "." }
 dependencies = [
     { name = "ipython" },
