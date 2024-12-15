@@ -125,7 +125,8 @@ class SearchDocChatAgent(DocChatAgent):
 
 def cli():
     Fire(main)
-    
+
+
 def main(
     debug: bool = False,
     nocache: bool = False,
