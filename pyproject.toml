@@ -15,7 +15,7 @@ chat = "examples.basic.chat:app"
 completion = "examples.basic.completion:app"
 chatdoc = "examples.docqa.chat:app"
 chatsearch = "examples.docqa.chat_search:main"
-"
+
 
 
 
