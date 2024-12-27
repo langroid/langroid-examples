@@ -117,7 +117,7 @@ async def on_chat_start():
             """
         Agent uses a tool/fn-call to search the web 
         
-        Default search is using MetaphorSearch. You can switch the search to 
+        Default search is using DuckDuckGo. You can switch the search to 
         - Duckduckgo by typing `/d` at the start of your question
         - Metaphor by typing `/m` at the start of your question
         
