@@ -24,7 +24,15 @@ First clone this repo, then go to the root dir (e.g., `cd langroid-examples`).
 
 Install `uv`, see [here](https://docs.astral.sh/uv/getting-started/installation/)
 
-Then run any of the examples as in the examples below:
+Create a virtual env with Python 3.11, activate it, install dependencies:
+
+```bash
+uv venv --python 3.11
+. ./.venv/bin/activate
+uv sync
+```
+
+Then run any of the scripts as in the examples below:
 
 ```bash
 uv run examples/basic/chat.py
