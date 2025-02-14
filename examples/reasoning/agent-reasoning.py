@@ -10,7 +10,14 @@ Run like this (omit the model argument to default to the deepseek-reasoner model
 or
     uv run examples/reasoning/agent-reasoning.py
 
-Other reasoning models to try: o1, o1-mini, o3-mini
+Other reasoning models to try:
+deepseek/deepseek-reasoner           # direct deepseek-r1 API
+openrouter/deepseek/deepseek-r1      # via OpenRouter
+o1
+o1-mini
+o3-mini
+ollama/deepseek-r1:8b
+gemini/gemini-2.0-flash-thinking-exp
 """
 
 import langroid as lr
@@ -38,10 +45,11 @@ def main(
     # (1) Direct LLM interaction
     llm = lm.OpenAIGPT(llm_config)
 
-    response = llm.chat("Is 9.3 bigger than 9.11?", max_tokens=1000)
+    response = llm.chat("Is 7.2 bigger than 7.11?", max_tokens=1000)
 
-    if response.cached:
-        # if we got it from cache, we haven't shown anything, so print here
+    if response.cached or not llm.get_stream():
+        # if we got it from cache, or streaming disabled/disallowed,
+        # we haven't shown anything, so print here
 
         # extract reasoning
         if response.reasoning:
@@ -63,21 +71,20 @@ def main(
         """
         10 years ago, Jack's dad was 5 times as old as Jack.
         Today, Jack's dad is 40 years older than Jack.
-        How old is Jack today?
+        So how old is Jack now ?
         """
     )
 
-    if response.metadata.cached:
-        # if we got it from cache, we haven't shown anything, so print here
-
-        # extract reasoning
-        if response.reasoning:
-            print(response.reasoning)
-        else:
-            print(f"NO REASONING AVAILABLE for {model}!")
-
-        # extract answer
-        print(response.content)
+    # extract reasoning
+    if response.reasoning:
+        print(
+            f"""
+            REASONING:
+            {response.reasoning}
+            """
+        )
+    else:
+        print(f"NO REASONING AVAILABLE for {model}!")
 
 
 if __name__ == "__main__":
