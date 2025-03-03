@@ -1,21 +1,27 @@
 """
-Example of a Langroid DocChatAgent equipped with a vector-store and LLM.
+Example of a Langroid DocChatAgent equipped with a vector-store and LangDB.
 
 This is a specialized agent that can ingest (chunk, embed, store in vector-DB)
 a collection of documents, and the LLM uses Retrieval Augmented Generation (RAG)
 to answer questions about the documents.
 
+This example demonstrates how to use LangDB with custom headers like x-label, x-thread-id, 
+and x-run-id when using a Langroid DocChatAgent with RAG capabilities.
+
 Run as follows:
 
-python3 examples/quick-start/chat-agent-docs.py
+python3 examples/langdb/langdb_chat_agent_docs.py
 
 For more explanation see
 [the Getting Started guide](https://langroid.github.io/langroid/quick-start/chat-agent-docs/).
 """
 
+import uuid
 import typer
 from rich import print
 import langroid as lr
+from langroid.language_models.openai_gpt import OpenAIGPTConfig
+from langroid.language_models.openai_gpt import LangDBParams
 
 app = typer.Typer()
 
@@ -56,18 +62,41 @@ documents = [
 def chat() -> None:
     print(
         """
-        [blue]Welcome to the retrieval-augmented chatbot!
+        [blue]Welcome to the LangDB retrieval-augmented chatbot!
         Enter x or q to quit
         """
     )
 
-    config = lr.agent.special.DocChatAgentConfig(
-        llm=lr.language_models.OpenAIGPTConfig(
-            chat_model=lr.language_models.OpenAIChatModel.GPT4o,
+    # Generate UUIDs for run_id and thread_id
+    run_id = str(uuid.uuid4())
+    thread_id = str(uuid.uuid4())
+
+    print(f"run_id: {run_id}, thread_id: {thread_id}")
+
+    # Create a LangDB model configuration
+    # Make sure LANGDB_API_KEY and LANGDB_PROJECT_ID are set in your environment
+    langdb_config = OpenAIGPTConfig(
+        chat_model="langdb/openai/gpt-4o-mini",  # Using LangDB model
+        langdb_params=LangDBParams(
+            label="langroid-agent-docs",
+            run_id=run_id,
+            thread_id=thread_id,
+            # api_key is set via env var LANGDB_API_KEY
+            # project_id is set via env var LANGDB_PROJECT_ID
         ),
+    )
+
+    config = lr.agent.special.DocChatAgentConfig(
+        llm=langdb_config,
         vecdb=lr.vector_store.QdrantDBConfig(
-            collection_name="quick-start-chat-agent-docs",
+            collection_name="langdb-chat-agent-docs",
             replace_collection=True,
+            embedding=lr.embedding_models.OpenAIEmbeddingsConfig(
+                # Use LangDB for embeddings
+                model_name="langdb/openai/text-embedding-3-small",
+                # langdb_params.project_id is set via env var LANGDB_PROJECT_ID
+                # langdb_params.api_key is set via env var LANGDB_API_KEY
+            ),
         ),
         parsing=lr.parsing.parser.ParsingConfig(
             separators=["\n\n"],
@@ -87,6 +116,7 @@ def main(
     no_stream: bool = typer.Option(False, "--nostream", "-ns", help="no streaming"),
     nocache: bool = typer.Option(False, "--nocache", "-nc", help="don't use cache"),
 ) -> None:
+    # Set up settings
     lr.utils.configuration.set_global(
         lr.utils.configuration.Settings(
             debug=debug,
