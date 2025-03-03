@@ -16,17 +16,20 @@ Optional args:
     -f: use OpenAI functions api instead of tools
     -m <model_name>:  run with a specific LLM
     (defaults to GPT4-Turbo if blank)
+    -c <crawler_name>: specify a crawler to use for web search. Options are:
+         "trafilatura" (default), "firecrawl"
 
 See here for guide to using local LLMs with Langroid:
 https://langroid.github.io/langroid/tutorials/local-llm-setup/
 """
 
+import typer
 import re
-from typing import List, Any
+from typing import List, Any, Optional
 
 from rich import print
 from rich.prompt import Prompt
-
+import logging
 import langroid as lr
 import langroid.language_models as lm
 from langroid.agent.tools.orchestration import ForwardTool
@@ -36,11 +39,18 @@ from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
     DocChatAgentConfig,
 )
-from langroid.parsing.web_search import metaphor_search
+from langroid.parsing.web_search import exa_search
 from langroid.agent.task import Task
 from langroid.utils.constants import NO_ANSWER
 from langroid.utils.configuration import set_global, Settings
 from fire import Fire
+from langroid.parsing.url_loader import (
+    TrafilaturaConfig,
+    FirecrawlConfig,
+    ExaCrawlerConfig,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class RelevantExtractsTool(ToolMessage):
@@ -85,11 +95,32 @@ class RelevantSearchExtractsTool(ToolMessage):
 
 class SearchDocChatAgent(DocChatAgent):
     tried_vecdb: bool = False
+    crawler: Optional[str] = None
+
+    def __init__(self, config: DocChatAgentConfig, crawler: Optional[str] = None):
+        super().__init__(config)
+        self.tried_vecdb = False
+        self.crawler = crawler
+        self.update_crawler_config(crawler)
+
+    def update_crawler_config(self, crawler: Optional[str]):
+        """Updates the crawler config based on the crawler argument."""
+        if crawler == "firecrawl":
+            self.config.crawler_config = FirecrawlConfig()
+        elif crawler == "trafilatura" or crawler is None:
+            self.config.crawler_config = TrafilaturaConfig()
+        elif crawler == "exa":
+            self.config.crawler_config = ExaCrawlerConfig()
+        else:
+            raise ValueError(
+                f"Unsupported crawler {crawler}. Options are: 'trafilatura', 'firecrawl'"
+            )
 
     def llm_response(
         self,
         message: None | str | ChatDocument = None,
     ) -> ChatDocument | None:
+        # override llm_response of DocChatAgent to allow use of the tools.
         return ChatAgent.llm_response(self, message)
 
     def handle_message_fallback(self, msg: str | ChatDocument) -> Any:
@@ -115,10 +146,13 @@ class SearchDocChatAgent(DocChatAgent):
         self.tried_vecdb = False
         query = msg.query
         num_results = msg.num_results
-        results = metaphor_search(query, num_results)
+        logger.warning("Trying exa search...")
+        results = exa_search(query, num_results)
         links = [r.link for r in results]
+        logger.warning(f"Found {len(links)} links, ingesting into vecdb...")
         self.config.doc_paths = links
         self.ingest()
+        logger.warning(f"Ingested {len(links)} links into vecdb")
         _, extracts = self.get_relevant_extracts(query)
         return "\n".join(str(e) for e in extracts)
 
@@ -127,12 +161,32 @@ def cli():
     Fire(main)
 
 
+app = typer.Typer()
+
+
+@app.command()
 def main(
     debug: bool = False,
     nocache: bool = False,
     model: str = "",
     fn_api: bool = True,
+    crawler: Optional[str] = typer.Option(
+        None,
+        "--crawler",
+        "-c",
+        help="Specify a crawler to use (trafilatura, firecrawl)",
+    ),
 ) -> None:
+    """
+    Main function to run the chatbot.
+
+    Args:
+        debug (bool): Enable debug mode.
+        nocache (bool): Disable caching.
+        model (str): Specify the LLM model to use.
+        fn_api (bool): Use OpenAI functions API instead of tools.
+        crawler (str): Specify the crawler to use for web search.
+    """
 
     set_global(
         Settings(
@@ -169,7 +223,7 @@ def main(
         # "ollama/llama2"
         # "local/localhost:8000/v1"
         # "local/localhost:8000"
-        chat_context_length=2048,  # adjust based on model
+        chat_context_length=8000,  # adjust based on model
     )
 
     config = DocChatAgentConfig(
@@ -188,7 +242,7 @@ def main(
         3. If you are still unable to answer, you can use the `relevant_search_extracts`
            tool/function-call to get some text from a web search. Once you receive the
            text, you can use it to answer my question.
-        4. If you still can't answer, simply say {NO_ANSWER} 
+        5. If you still can't answer, simply say {NO_ANSWER} 
         
         Remember to always FIRST try `relevant_extracts` to see if there are already 
         any relevant docs, before trying web-search with `relevant_search_extracts`.
@@ -204,9 +258,13 @@ def main(
         """,
     )
 
-    agent = SearchDocChatAgent(config)
-    agent.enable_message(RelevantExtractsTool)
-    agent.enable_message(RelevantSearchExtractsTool)
+    agent = SearchDocChatAgent(config, crawler=crawler)
+    agent.enable_message(
+        [
+            RelevantExtractsTool,
+            RelevantSearchExtractsTool,
+        ]
+    )
     collection_name = Prompt.ask(
         "Name a collection to use",
         default="docqa-chat-search",
@@ -225,8 +283,10 @@ def main(
     agent.vecdb.set_collection(collection_name, replace=replace)
 
     task = Task(agent, interactive=False)
-    task.run("Can you help me answer some questions, possibly using web search?")
+    task.run(
+        "Can you help me answer some questions, possibly using web search and crawling?"
+    )
 
 
 if __name__ == "__main__":
-    Fire(main)
+    app()
