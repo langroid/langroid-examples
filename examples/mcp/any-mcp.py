@@ -1,15 +1,17 @@
 """
-Simple example of using the BioMCP server.
+Generic script to connect to any MCP Server.
 
-https://github.com/genomoncology/biomcp
+Steps:
+- from the MCP server page, determine what type of transport is need to connect.
+- import the appropriate transport
+- set up the `transport` variable in the first line
 
-The server offers several tools, and we can enable ALL of them to be used
-by a Langroid agent.
+Run like this (omitting the `--model` argument will use the default GPT-4.1-Mini):
 
-Run like this:
+    uv run examples/mcp/any-mcp.py --model ollama/qwen2.5-coder:32b
 
-    uv run examples/mcp/biomcp.py --model gpt-4.1-mini
-
+See docs on various types of transports that are available:
+https://langroid.github.io/langroid/notes/mcp-tools/
 """
 
 import langroid as lr
@@ -21,8 +23,10 @@ from fire import Fire
 
 
 async def main(model: str = ""):
-    transport = StdioTransport(
-        command="uv", args=["run", "--with", "biomcp-python", "biomcp", "run"]
+    transport = StdioTransport(  # or any other transport
+        command="...",
+        args=[],
+        env=dict(MY_VAR="blah"),
     )
     all_tools = await get_tools_async(transport)
 
