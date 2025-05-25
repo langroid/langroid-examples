@@ -1,44 +1,29 @@
 """
-Generic script to connect to any MCP Server.
+Interact with Claude Code's MCP server.
 
-Steps:
-- from the MCP server page, determine what type of transport is need to connect.
-- import the appropriate transport
-- set up the `transport` variable in the first line
 
 Run like this (omitting the `--model` argument will use the default GPT-4.1-Mini):
 
-    uv run examples/mcp/any-mcp.py --model ollama/qwen2.5-coder:32b
+    uv run examples/mcp/claude-code-mcp.py --model gpt-4.1-mini
 
-See docs on various types of transports that are available:
-https://langroid.github.io/langroid/notes/mcp-tools/
+
 """
 
-import os
 import langroid as lr
 import langroid.language_models as lm
 from langroid.mytypes import NonToolAction
 from langroid.agent.tools.mcp.fastmcp_client import get_tools_async
 from fastmcp.client.transports import (
-    SSETransport,
+    StdioTransport,
 )
 from fire import Fire
 
-# trying to connect to openmemory
-
-URL = "http://localhost:8765"
-# set userid to my own, got from os: $USER
-userid = os.getenv("USER")
-
 
 async def main(model: str = ""):
-    transport = SSETransport(
-        url=URL + "/mcp/cursor/sse/" + userid,
-        # Additional headers might be needed
-        headers={"Content-Type": "application/json", "Accept": "text/event-stream"},
-        # command="...",
-        # args=[],
-        # env=dict(MY_VAR="blah"),
+    transport = StdioTransport(
+        command="claude",
+        args=["mcp", "serve"],
+        env={},
     )
     all_tools = await get_tools_async(transport)
 
@@ -46,6 +31,12 @@ async def main(model: str = ""):
         lr.ChatAgentConfig(
             # forward to user when LLM doesn't use a tool
             handle_llm_no_tool=NonToolAction.FORWARD_USER,
+            system_message="""
+            You are a coding assistant who has access to 
+            various tools from Claude Code. You can use these tools to
+            to help the user with their coding-related tasks
+            or code-related questions.
+            """,
             llm=lm.OpenAIGPTConfig(
                 chat_model=model or "gpt-4.1-mini",
                 max_output_tokens=1000,
