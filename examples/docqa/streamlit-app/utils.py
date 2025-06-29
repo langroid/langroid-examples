@@ -1,10 +1,12 @@
-from langroid.agent.special import DocChatAgent, DocChatAgentConfig
-from langroid.vector_store.qdrantdb import QdrantDBConfig
-from langroid.embedding_models.models import OpenAIEmbeddingsConfig
-from langroid.parsing.parser import ParsingConfig
-from langroid.language_models.openai_gpt import OpenAIGPTConfig
 import os
+
 import streamlit as st
+
+from langroid.agent.special import DocChatAgent, DocChatAgentConfig
+from langroid.embedding_models.models import OpenAIEmbeddingsConfig
+from langroid.language_models.openai_gpt import OpenAIGPTConfig
+from langroid.parsing.parser import ParsingConfig
+from langroid.vector_store.qdrantdb import QdrantDBConfig
 
 OPENAI_KEY = os.environ["OPENAI_API_KEY"]
 
@@ -23,10 +25,11 @@ def configure(filename: str, chat_model: str = "") -> DocChatAgentConfig:
 
     # Configuring DocChatAgent
     cfg = DocChatAgentConfig(
+        n_similar_chunks=4,
+        n_relevant_chunks=4,
         parsing=ParsingConfig(
             chunk_size=100,
             overlap=20,
-            n_similar_docs=4,
         ),
         show_stats=False,
         cross_encoder_reranking_model="",

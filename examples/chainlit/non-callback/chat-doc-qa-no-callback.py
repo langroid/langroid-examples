@@ -26,8 +26,9 @@ https://langroid.github.io/langroid/tutorials/local-llm-setup/
 """
 
 import chainlit as cl
-import langroid.parsing.parser as lp
+
 import langroid.language_models as lm
+import langroid.parsing.parser as lp
 from langroid.agent.special.doc_chat_agent import DocChatAgent, DocChatAgentConfig
 
 
@@ -50,6 +51,8 @@ async def setup_agent() -> None:
         hypothetical_answer=False,
         # set it to > 0 to retrieve a window of k chunks on either side of a match
         n_neighbor_chunks=0,
+        n_similar_chunks=3,
+        n_relevant_chunks=3,
         llm=llm_config,
         parsing=lp.ParsingConfig(  # modify as needed
             splitter=lp.Splitter.TOKENS,
@@ -61,7 +64,6 @@ async def setup_agent() -> None:
             # truncating due to punctuation
             min_chunk_chars=200,
             discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-            n_similar_docs=3,
             # NOTE: PDF parsing is extremely challenging, each library has its own
             # strengths and weaknesses. Try one that works for your use case.
             pdf=lp.PdfParsingConfig(

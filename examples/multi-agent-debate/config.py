@@ -1,12 +1,14 @@
-from typing import Optional, List
+from typing import List, Optional
+
+from generation_config_models import GenerationConfig, load_generation_config
+
 import langroid as lr
 import langroid.language_models as lm
 import langroid.utils.configuration
-from langroid.language_models import OpenAIGPTConfig
-from langroid.utils.configuration import Settings
 from langroid.agent.special import DocChatAgentConfig
+from langroid.language_models import OpenAIGPTConfig
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
-from generation_config_models import load_generation_config, GenerationConfig
+from langroid.utils.configuration import Settings
 
 # Constants
 MODEL_MAP = {
@@ -148,6 +150,8 @@ def get_questions_agent_config(
         debug=False,  # Debug mode enabled
         stream=True,  # Whether to stream data continuously
         split=True,  # Whether to split documents into manageable chunks
+        n_similar_chunks=5,  # Number of similar chunks to retrieve
+        n_relevant_chunks=5,  # Number of relevant chunks to retrieve
         parsing=ParsingConfig(
             splitter=Splitter.TOKENS,  # Method to split documents
             chunk_size=200,  # Size of each chunk
@@ -156,7 +160,6 @@ def get_questions_agent_config(
             n_neighbor_ids=4,  # Number of neighbor IDs to consider in vector space
             min_chunk_chars=200,  # Minimum number of characters in a chunk
             discard_chunk_chars=4,  # Number of characters to discard from chunk boundaries
-            n_similar_docs=5,  # Number of similar documents to retrieve
             pdf=PdfParsingConfig(
                 library="fitz",  # Library used for PDF parsing
             ),

@@ -8,25 +8,25 @@ Single agent to chat with multiple docs, with filtering based on user query.
 
 """
 
+import json
+import os
 from typing import Optional
 
+from fire import Fire
 from rich import print
 from rich.prompt import Prompt
-import os
-import json
 
-from langroid.pydantic_v1 import Field
 import langroid as lr
 import langroid.language_models as lm
 from langroid import ChatDocument
 from langroid.agent.special.doc_chat_agent import DocChatAgentConfig
+from langroid.embedding_models.models import OpenAIEmbeddingsConfig
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
+from langroid.pydantic_v1 import Field
+from langroid.utils.configuration import Settings, set_global
+from langroid.utils.pydantic_utils import temp_update
 from langroid.vector_store.lancedb import LanceDBConfig
 from langroid.vector_store.qdrantdb import QdrantDBConfig
-from langroid.embedding_models.models import OpenAIEmbeddingsConfig
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.pydantic_utils import temp_update
-from fire import Fire
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -149,6 +149,8 @@ def main(
         hypothetical_answer=False,
         # set it to > 0 to retrieve a window of k chunks on either side of a match
         n_neighbor_chunks=0,
+        n_similar_chunks=3,
+        n_relevant_chunks=3,
         llm=llm_config,
         # system_message="...override default DocChatAgent system msg here",
         # user_message="...override default DocChatAgent user msg here",
@@ -163,7 +165,6 @@ def main(
             # truncating due to punctuation
             min_chunk_chars=200,
             discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-            n_similar_docs=3,
             # NOTE: PDF parsing is extremely challenging, each library has its own
             # strengths and weaknesses. Try one that works for your use case.
             pdf=PdfParsingConfig(

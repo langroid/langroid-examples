@@ -14,21 +14,22 @@ python3 examples/basic/multi-agent-triage.py --model groq/llama-3.1-70b-versatil
 
 """
 
+import os
 from typing import Optional
+
+from fire import Fire
 
 import langroid as lr
 import langroid.language_models as lm
-from langroid.parsing.urls import find_urls
 from langroid import ChatDocument
 from langroid.agent.tools.orchestration import (
-    ForwardTool,
     AgentDoneTool,
+    ForwardTool,
     SendTool,
 )
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig
+from langroid.parsing.urls import find_urls
 from langroid.vector_store.qdrantdb import QdrantDBConfig
-import os
-from fire import Fire
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -133,7 +134,6 @@ def main(model: str = ""):
         # truncating due to punctuation
         min_chunk_chars=50,
         discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-        n_similar_docs=5,
         n_neighbor_ids=5,  # num chunk IDs to store on either side of each chunk
         pdf=PdfParsingConfig(
             # NOTE: PDF parsing is extremely challenging, and each library
@@ -173,6 +173,8 @@ def main(model: str = ""):
             ),
             parsing=parsing_config,
             n_neighbor_chunks=3,
+            n_similar_chunks=5,
+            n_relevant_chunks=5,
         )
     )
 
@@ -207,6 +209,8 @@ def main(model: str = ""):
             ),
             parsing=parsing_config,
             n_neighbor_chunks=3,
+            n_similar_chunks=5,
+            n_relevant_chunks=5,
         )
     )
 

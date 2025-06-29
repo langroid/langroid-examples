@@ -1,9 +1,9 @@
 """
-Version of main.py, but does NOT use any inter-agent orchestration,
- i.e. we create a separate Task object from each agent, but we do not
- connect them as sub-tasks.
- Instead we write extra code to handle each task's output, and
- determine what to do with it.
+Version of examples/basic/multi-agent-search-critic/main.py, but does NOT use any
+inter-agent orchestration, i.e. we create a separate Task object from each agent,
+but we do not connect them as sub-tasks.
+Instead we write extra code to handle each task's output, and
+determine what to do with it.
 
 3-Agent system where:
 - Assistant takes user's (complex) question, breaks it down into smaller pieces
@@ -40,12 +40,14 @@ import typer
 from dotenv import load_dotenv
 from rich import print
 from rich.prompt import Prompt
+
 import langroid as lr
-from .tools import QuestionTool, AnswerTool, FinalAnswerTool, FeedbackTool
-from .search_agent import make_search_task
-from .critic_agent import make_critic_task
-from .assistant_agent import make_assistant_task
 from langroid.utils.configuration import Settings, set_global
+
+from .assistant_agent import make_assistant_task
+from .critic_agent import make_critic_task
+from .search_agent import make_search_task
+from .tools import AnswerTool, FeedbackTool, FinalAnswerTool, QuestionTool
 
 app = typer.Typer()
 

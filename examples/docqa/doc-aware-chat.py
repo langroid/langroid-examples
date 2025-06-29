@@ -17,26 +17,26 @@ Run like this:
 python3 examples/docqa/doc-aware-chat.py
 """
 
-from typing import Optional, Any
+import os
+from typing import Any, Optional
 
+from fire import Fire
 from rich import print
 from rich.prompt import Prompt
-import os
 
+import langroid.language_models as lm
 from langroid import ChatDocument
+from langroid.agent.chat_agent import ChatAgent
 from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
     DocChatAgentConfig,
 )
-import langroid.language_models as lm
-from langroid.mytypes import Entity
-from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
-from langroid.agent.chat_agent import ChatAgent
 from langroid.agent.task import Task
 from langroid.agent.tools.orchestration import ForwardTool
 from langroid.agent.tools.retrieval_tool import RetrievalTool
-from langroid.utils.configuration import set_global, Settings
-from fire import Fire
+from langroid.mytypes import Entity
+from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
+from langroid.utils.configuration import Settings, set_global
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -93,6 +93,8 @@ def main(
         # this turns off standalone-query reformulation; set to False to enable it.
         assistant_mode=True,
         n_neighbor_chunks=2,
+        n_similar_chunks=5,
+        n_relevant_chunks=5,
         parsing=ParsingConfig(  # modify as needed
             splitter=Splitter.TOKENS,
             chunk_size=100,  # aim for this many tokens per chunk
@@ -103,7 +105,6 @@ def main(
             # truncating due to punctuation
             min_chunk_chars=200,
             discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-            n_similar_docs=5,
             # NOTE: PDF parsing is extremely challenging, each library has its own
             # strengths and weaknesses. Try one that works for your use case.
             pdf=PdfParsingConfig(

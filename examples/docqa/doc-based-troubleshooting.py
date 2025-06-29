@@ -13,26 +13,26 @@ python3 examples/docqa/doc-based-troubleshooting.py
 
 """
 
+import os
 from typing import Optional
 
+from fire import Fire
 from rich import print
 from rich.prompt import Prompt
-import os
 
+import langroid as lr
+import langroid.language_models as lm
 from langroid import ChatDocument
+from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
 from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
     DocChatAgentConfig,
 )
-import langroid as lr
-import langroid.language_models as lm
+from langroid.agent.task import Task
 from langroid.mytypes import Entity
 from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
-from langroid.agent.chat_agent import ChatAgent, ChatAgentConfig
-from langroid.agent.task import Task
-from langroid.utils.configuration import set_global, Settings
-from langroid.utils.constants import DONE, NO_ANSWER, AT
-from fire import Fire
+from langroid.utils.configuration import Settings, set_global
+from langroid.utils.constants import AT, DONE, NO_ANSWER
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -94,6 +94,8 @@ def main(
         hypothetical_answer=False,
         assistant_mode=True,
         n_neighbor_chunks=2,
+        n_similar_chunks=5,
+        n_relevant_chunks=5,
         parsing=ParsingConfig(  # modify as needed
             splitter=Splitter.TOKENS,
             chunk_size=100,  # aim for this many tokens per chunk
@@ -104,7 +106,6 @@ def main(
             # truncating due to punctuation
             min_chunk_chars=200,
             discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-            n_similar_docs=5,
             # NOTE: PDF parsing is extremely challenging, each library has its own
             # strengths and weaknesses. Try one that works for your use case.
             pdf=PdfParsingConfig(

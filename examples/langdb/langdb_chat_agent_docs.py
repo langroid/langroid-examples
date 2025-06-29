@@ -17,11 +17,12 @@ For more explanation see
 """
 
 import uuid
+
 import typer
 from rich import print
+
 import langroid as lr
-from langroid.language_models.openai_gpt import OpenAIGPTConfig
-from langroid.language_models.openai_gpt import LangDBParams
+from langroid.language_models.openai_gpt import LangDBParams, OpenAIGPTConfig
 
 app = typer.Typer()
 
@@ -88,6 +89,8 @@ def chat() -> None:
 
     config = lr.agent.special.DocChatAgentConfig(
         llm=langdb_config,
+        n_similar_chunks=2,
+        n_relevant_chunks=2,
         vecdb=lr.vector_store.QdrantDBConfig(
             collection_name="langdb-chat-agent-docs",
             replace_collection=True,
@@ -101,7 +104,6 @@ def chat() -> None:
         parsing=lr.parsing.parser.ParsingConfig(
             separators=["\n\n"],
             splitter=lr.parsing.parser.Splitter.SIMPLE,
-            n_similar_docs=2,
         ),
     )
     agent = lr.agent.special.DocChatAgent(config)

@@ -38,15 +38,15 @@ from rich.table import Table
 
 import langroid as lr
 import langroid.language_models as lm
+from langroid.agent.batch import run_batch_function
 from langroid.agent.special.doc_chat_agent import (
+    ChunkEnrichmentAgentConfig,
     DocChatAgent,
     DocChatAgentConfig,
-    ChunkEnrichmentAgentConfig,
 )
 from langroid.parsing.parser import ParsingConfig
 from langroid.utils.configuration import Settings
 from langroid.vector_store.qdrantdb import QdrantDBConfig
-from langroid.agent.batch import run_batch_function
 
 app = typer.Typer()
 
@@ -116,11 +116,12 @@ def run_document_chatbot(
         rerank_diversity=False,
         rerank_periphery=False,
         use_reciprocal_rank_fusion=False,
+        n_similar_chunks=10,
+        n_relevant_chunks=10,
         parsing=ParsingConfig(
             chunk_size=120,
             overlap=15,
             min_chunk_chars=50,
-            n_similar_docs=10,
         ),
         # n_neighbor_chunks=1,
         chunk_enrichment_config=enrichment_config if use_hq else None,

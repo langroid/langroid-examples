@@ -14,20 +14,21 @@ other supported vector-dbs, e.g. lancedb or chroma.
 
 """
 
+import os
 import re
+
 import typer
 from rich import print
 from rich.prompt import Prompt
-import os
 
 import langroid.language_models as lm
 from langroid.agent.special.doc_chat_agent import (
     DocChatAgent,
     DocChatAgentConfig,
 )
-from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
 from langroid.agent.task import Task
-from langroid.utils.configuration import set_global, Settings
+from langroid.parsing.parser import ParsingConfig, PdfParsingConfig, Splitter
+from langroid.utils.configuration import Settings, set_global
 
 app = typer.Typer()
 
@@ -56,6 +57,8 @@ def main(
         hypothetical_answer=False,
         # set it to > 0 to retrieve a window of k chunks on either side of a match
         n_neighbor_chunks=0,
+        n_similar_chunks=3,
+        n_relevant_chunks=3,
         llm=llm_config,
         # system_message="...override default DocChatAgent system msg here",
         # user_message="...override default DocChatAgent user msg here",
@@ -70,7 +73,6 @@ def main(
             # truncating due to punctuation
             min_chunk_chars=200,
             discard_chunk_chars=5,  # discard chunks with fewer than this many chars
-            n_similar_docs=3,
             # NOTE: PDF parsing is extremely challenging, each library has its own
             # strengths and weaknesses. Try one that works for your use case.
             pdf=PdfParsingConfig(
